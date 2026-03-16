@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import Enum as PyEnum
 from sqlalchemy import (
     Column, Integer, String, Text, Boolean, DateTime,
-    ForeignKey, Enum, Float, Time
+    ForeignKey, Enum, Float, Time, JSON
 )
 from sqlalchemy.orm import relationship
 
@@ -38,6 +38,37 @@ class DayOfWeek(int, PyEnum):
     SUNDAY = 6
 
 
+class SubscriptionTier(str, PyEnum):
+    """Subscription tier enumeration."""
+    FREE_TRIAL = "free_trial"
+    PREMIUM = "premium"
+    PRO = "pro"
+    TRIAL_EXPIRED = "trial_expired"
+
+
+class SubscriptionStatus(str, PyEnum):
+    """Subscription status enumeration."""
+    ACTIVE = "active"
+    CANCELLED = "cancelled"
+    PAST_DUE = "past_due"
+    EXPIRED = "expired"
+    TRIALING = "trialing"
+
+
+class PaymentProvider(str, PyEnum):
+    """Payment provider enumeration."""
+    STRIPE = "stripe"
+    PAYPAL = "paypal"
+
+
+class PaymentStatus(str, PyEnum):
+    """Payment status enumeration."""
+    PENDING = "pending"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    REFUNDED = "refunded"
+
+
 class User(Base):
     """User model for business owners."""
     __tablename__ = "users"
@@ -55,6 +86,8 @@ class User(Base):
 
     # Relationships
     businesses = relationship("Business", back_populates="owner")
+    subscription = relationship("Subscription", back_populates="user", uselist=False)
+    payments = relationship("Payment", back_populates="user")
 
 
 class Business(Base):
@@ -189,3 +222,64 @@ class NotificationLog(Base):
 
     # Relationships
     appointment = relationship("Appointment", back_populates="notification_logs")
+
+
+class Subscription(Base):
+    """Subscription model — tracks user subscription status and billing."""
+    __tablename__ = "subscriptions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True)
+    tier = Column(Enum(SubscriptionTier), default=SubscriptionTier.FREE_TRIAL, nullable=False)
+    status = Column(Enum(SubscriptionStatus), default=SubscriptionStatus.TRIALING, nullable=False)
+    currency = Column(String(3), default="USD", nullable=False)  # USD, GBP, CAD, AUD
+
+    # Trial tracking
+    trial_started_at = Column(DateTime, nullable=True)
+    trial_ends_at = Column(DateTime, nullable=True)
+
+    # Paid subscription tracking
+    current_period_start = Column(DateTime, nullable=True)
+    current_period_end = Column(DateTime, nullable=True)
+    cancelled_at = Column(DateTime, nullable=True)
+
+    # Provider references
+    stripe_customer_id = Column(String(255), nullable=True)
+    stripe_subscription_id = Column(String(255), nullable=True)
+    paypal_subscription_id = Column(String(255), nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    user = relationship("User", back_populates="subscription")
+    payments = relationship("Payment", back_populates="subscription")
+
+
+class Payment(Base):
+    """Payment transaction records."""
+    __tablename__ = "payments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    subscription_id = Column(Integer, ForeignKey("subscriptions.id"), nullable=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    provider = Column(Enum(PaymentProvider), nullable=False)
+    status = Column(Enum(PaymentStatus), default=PaymentStatus.PENDING, nullable=False)
+
+    # Amount in minor currency units (e.g. cents)
+    amount = Column(Integer, nullable=False)  # e.g. 1200 = $12.00
+    currency = Column(String(3), nullable=False, default="USD")
+
+    # Provider references
+    provider_payment_id = Column(String(255), nullable=True)  # Stripe charge ID / PayPal order ID
+    provider_invoice_id = Column(String(255), nullable=True)
+
+    description = Column(String(500), nullable=True)
+    failure_reason = Column(Text, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    subscription = relationship("Subscription", back_populates="payments")
+    user = relationship("User", back_populates="payments")

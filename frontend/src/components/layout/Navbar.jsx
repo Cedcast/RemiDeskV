@@ -9,6 +9,7 @@ import {
   UserCircleIcon,
   Bars3Icon,
   XMarkIcon,
+  CreditCardIcon,
 } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 
@@ -28,6 +29,7 @@ const Navbar = () => {
         { name: 'Appointments', href: '/dashboard/appointments', icon: CalendarIcon },
         { name: 'Clients', href: '/dashboard/clients', icon: UserGroupIcon },
         { name: 'My Business', href: '/dashboard/business', icon: BuildingOfficeIcon },
+        { name: 'Billing', href: '/dashboard/billing', icon: CreditCardIcon },
       ]
     : [];
 
@@ -36,9 +38,9 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
-            <Link to="/dashboard" className="flex items-center">
+            <Link to="/" className="flex items-center">
               <CalendarIcon className="h-8 w-8 text-indigo-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900">BookIt</span>
+              <span className="ml-2 text-xl font-bold text-gray-900">RemiDesk</span>
             </Link>
             {isAuthenticated && (
               <div className="hidden sm:ml-8 sm:flex sm:space-x-4">
@@ -57,6 +59,14 @@ const Navbar = () => {
           </div>
 
           <div className="hidden sm:flex sm:items-center sm:space-x-4">
+            {!isAuthenticated && (
+              <Link
+                to="/pricing"
+                className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600"
+              >
+                Pricing
+              </Link>
+            )}
             {isAuthenticated ? (
               <>
                 <div className="flex items-center text-sm text-gray-700">
@@ -83,7 +93,7 @@ const Navbar = () => {
                   to="/register"
                   className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700"
                 >
-                  Sign up
+                  Start Free Trial
                 </Link>
               </>
             )}
@@ -120,6 +130,15 @@ const Navbar = () => {
                 {item.name}
               </Link>
             ))}
+            {!isAuthenticated && (
+              <Link
+                to="/pricing"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center px-4 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50"
+              >
+                Pricing
+              </Link>
+            )}
             {isAuthenticated ? (
               <button
                 onClick={() => {
@@ -145,7 +164,7 @@ const Navbar = () => {
                   onClick={() => setMobileMenuOpen(false)}
                   className="block px-4 py-2 text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 mx-4 rounded-lg text-center"
                 >
-                  Sign up
+                  Start Free Trial
                 </Link>
               </>
             )}

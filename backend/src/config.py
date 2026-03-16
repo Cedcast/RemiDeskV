@@ -32,6 +32,17 @@ class Settings(BaseSettings):
     stripe_secret_key: Optional[str] = None
     stripe_publishable_key: Optional[str] = None
     stripe_webhook_secret: Optional[str] = None
+    stripe_premium_price_id: Optional[str] = None  # Stripe Price ID for Premium plan
+    stripe_pro_price_id: Optional[str] = None  # Stripe Price ID for Pro plan
+
+    # PayPal (International Payments)
+    paypal_client_id: Optional[str] = None
+    paypal_client_secret: Optional[str] = None
+    paypal_mode: str = "sandbox"  # sandbox | live
+
+    # Billing Settings
+    free_trial_days: int = 7
+    app_currency_default: str = "USD"  # Default currency (USD, GBP, CAD, AUD)
 
     # Frontend URL (for CORS and reschedule links)
     frontend_url: str = "http://localhost:5173"

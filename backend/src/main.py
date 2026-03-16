@@ -14,6 +14,7 @@ from .routers import (
     appointments_router,
     clients_router,
     analytics_router,
+    subscriptions_router,
 )
 
 # Create FastAPI application
@@ -83,3 +84,4 @@ app.include_router(availability_router, prefix="/api")
 app.include_router(appointments_router, prefix="/api")
 app.include_router(clients_router, prefix="/api")
 app.include_router(analytics_router, prefix="/api")
+app.include_router(subscriptions_router, prefix="/api")
