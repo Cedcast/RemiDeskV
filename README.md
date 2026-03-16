@@ -1,3 +1,230 @@
 # B2B Appointment SaaS
 
-This project is designed to provide B2B appointment scheduling services to businesses. Further details will be added as the project develops.
+A comprehensive B2B appointment scheduling platform designed for micro businesses in the UK, Canada, and Australia. This full-stack application enables businesses to manage their services, availability, and appointments while allowing customers to easily discover and book services.
+
+## Features
+
+### For Business Owners
+- **Business Management**: Create and manage business profiles with contact information
+- **Service Management**: Define services with customizable duration and pricing
+- **Availability Management**: Set weekly schedules and business hours
+- **Appointment Management**: View, confirm, complete, or cancel appointments
+- **Dashboard Analytics**: Track appointments, revenue, and customer statistics
+
+### For Customers
+- **Business Discovery**: Search and filter businesses by location
+- **Service Browsing**: View available services with pricing and duration
+- **Online Booking**: Book appointments with real-time availability
+- **Appointment Management**: View, reschedule, and cancel bookings
+
+### Integrations (Ready for Configuration)
+- **Twilio**: SMS notifications and reminders
+- **SendGrid**: Email notifications
+- **Stripe**: Payment processing
+
+## Tech Stack
+
+### Backend
+- **Framework**: FastAPI (Python)
+- **Database**: SQLAlchemy ORM with SQLite (development) / PostgreSQL (production)
+- **Authentication**: JWT tokens with bcrypt password hashing
+- **API Documentation**: OpenAPI/Swagger (auto-generated)
+
+### Frontend
+- **Framework**: React 19 with Vite
+- **Styling**: Tailwind CSS
+- **Routing**: React Router v7
+- **State Management**: React Context API
+- **HTTP Client**: Axios
+- **Notifications**: React Hot Toast
+
+## Project Structure
+
+```
+B2B-appointment-SaaS/
+├── backend/
+│   ├── src/
+│   │   ├── main.py              # FastAPI application entry point
+│   │   ├── database.py          # Database configuration
+│   │   ├── models.py            # SQLAlchemy models
+│   │   ├── schemas.py           # Pydantic schemas
+│   │   ├── auth.py              # Authentication utilities
+│   │   ├── routers/             # API route handlers
+│   │   │   ├── auth.py
+│   │   │   ├── businesses.py
+│   │   │   ├── services.py
+│   │   │   ├── availability.py
+│   │   │   └── appointments.py
+│   │   └── integrations/        # Third-party integrations
+│   │       ├── twilio_service.py
+│   │       ├── sendgrid_service.py
+│   │       └── stripe_service.py
+│   ├── tests/                   # Backend tests
+│   ├── alembic/                 # Database migrations
+│   └── requirements.txt
+├── frontend/
+│   ├── src/
+│   │   ├── components/          # React components
+│   │   │   ├── common/          # Reusable UI components
+│   │   │   ├── layout/          # Layout components
+│   │   │   └── auth/            # Auth-related components
+│   │   ├── pages/               # Page components
+│   │   │   ├── auth/            # Login, Register
+│   │   │   ├── customer/        # Customer-facing pages
+│   │   │   └── business/        # Business dashboard pages
+│   │   ├── contexts/            # React contexts
+│   │   └── services/            # API service layer
+│   └── package.json
+└── README.md
+```
+
+## Getting Started
+
+### Prerequisites
+- Python 3.10+
+- Node.js 18+
+- npm or yarn
+
+### Backend Setup
+
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+
+2. Create a virtual environment (recommended):
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Set up environment variables (create `.env` file):
+   ```env
+   APP_ENV=development
+   SECRET_KEY=your-secret-key-here
+   DATABASE_URL=sqlite:///./app.db
+   
+   # Optional integrations
+   TWILIO_ACCOUNT_SID=your-twilio-sid
+   TWILIO_AUTH_TOKEN=your-twilio-token
+   TWILIO_PHONE_NUMBER=+1234567890
+   
+   SENDGRID_API_KEY=your-sendgrid-key
+   SENDGRID_FROM_EMAIL=noreply@yourdomain.com
+   
+   STRIPE_SECRET_KEY=your-stripe-secret
+   STRIPE_PUBLISHABLE_KEY=your-stripe-publishable
+   ```
+
+5. Run database migrations:
+   ```bash
+   alembic upgrade head
+   ```
+
+6. Start the backend server:
+   ```bash
+   uvicorn src.main:app --reload --port 8000
+   ```
+
+7. Access API documentation at: http://localhost:8000/docs
+
+### Frontend Setup
+
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+4. Access the application at: http://localhost:3000
+
+### Running Tests
+
+#### Backend Tests
+```bash
+cd backend
+python -m pytest tests/ -v
+```
+
+#### Frontend Linting
+```bash
+cd frontend
+npm run lint
+```
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/token` - Login and get JWT token
+- `GET /api/auth/me` - Get current user info
+
+### Businesses
+- `GET /api/businesses` - List all businesses
+- `GET /api/businesses/{id}` - Get business details
+- `POST /api/businesses` - Create new business
+- `PUT /api/businesses/{id}` - Update business
+- `GET /api/businesses/my` - Get user's businesses
+
+### Services
+- `GET /api/services/business/{business_id}` - Get services for a business
+- `GET /api/services/{id}` - Get service details
+- `POST /api/services` - Create new service
+- `PUT /api/services/{id}` - Update service
+- `DELETE /api/services/{id}` - Delete service
+
+### Availability
+- `GET /api/availability/schedules/{business_id}` - Get business schedules
+- `POST /api/availability/schedules` - Create schedule
+- `GET /api/availability/slots/{business_id}` - Get available time slots
+
+### Appointments
+- `GET /api/appointments` - List appointments
+- `GET /api/appointments/{id}` - Get appointment details
+- `POST /api/appointments` - Create appointment
+- `PATCH /api/appointments/{id}/status` - Update appointment status
+- `DELETE /api/appointments/{id}` - Cancel appointment
+- `GET /api/appointments/upcoming` - Get upcoming appointments
+- `GET /api/appointments/dashboard/stats` - Get dashboard statistics
+
+## Development
+
+### Database Migrations
+
+Create a new migration after model changes:
+```bash
+cd backend
+alembic revision --autogenerate -m "Description of changes"
+alembic upgrade head
+```
+
+### Code Style
+
+- Backend: Follow PEP 8 guidelines
+- Frontend: ESLint with React recommended rules
+
+## License
+
+MIT License
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests
+5. Submit a pull request
