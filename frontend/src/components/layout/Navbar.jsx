@@ -4,7 +4,7 @@ import {
   HomeIcon,
   CalendarIcon,
   BuildingOfficeIcon,
-  Cog6ToothIcon,
+  UserGroupIcon,
   ArrowRightOnRectangleIcon,
   UserCircleIcon,
   Bars3Icon,
@@ -13,7 +13,7 @@ import {
 import { useState } from 'react';
 
 const Navbar = () => {
-  const { user, logout, isBusinessOwner, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -23,17 +23,12 @@ const Navbar = () => {
   };
 
   const navigation = isAuthenticated
-    ? isBusinessOwner()
-      ? [
-          { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-          { name: 'Appointments', href: '/dashboard/appointments', icon: CalendarIcon },
-          { name: 'My Business', href: '/dashboard/business', icon: BuildingOfficeIcon },
-          { name: 'Settings', href: '/dashboard/settings', icon: Cog6ToothIcon },
-        ]
-      : [
-          { name: 'Find Services', href: '/businesses', icon: BuildingOfficeIcon },
-          { name: 'My Appointments', href: '/my-appointments', icon: CalendarIcon },
-        ]
+    ? [
+        { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
+        { name: 'Appointments', href: '/dashboard/appointments', icon: CalendarIcon },
+        { name: 'Clients', href: '/dashboard/clients', icon: UserGroupIcon },
+        { name: 'My Business', href: '/dashboard/business', icon: BuildingOfficeIcon },
+      ]
     : [];
 
   return (
@@ -41,7 +36,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
-            <Link to="/" className="flex items-center">
+            <Link to="/dashboard" className="flex items-center">
               <CalendarIcon className="h-8 w-8 text-indigo-600" />
               <span className="ml-2 text-xl font-bold text-gray-900">BookIt</span>
             </Link>

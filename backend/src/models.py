@@ -2,7 +2,7 @@
 from datetime import datetime
 from enum import Enum as PyEnum
 from sqlalchemy import (
-    Column, Integer, String, Text, Boolean, DateTime, 
+    Column, Integer, String, Text, Boolean, DateTime,
     ForeignKey, Enum, Float, Time
 )
 from sqlalchemy.orm import relationship
@@ -24,6 +24,7 @@ class AppointmentStatus(str, PyEnum):
     CANCELLED = "cancelled"
     COMPLETED = "completed"
     NO_SHOW = "no_show"
+    RESCHEDULED = "rescheduled"
 
 
 class DayOfWeek(int, PyEnum):
@@ -38,7 +39,7 @@ class DayOfWeek(int, PyEnum):
 
 
 class User(Base):
-    """User model for both customers and business owners."""
+    """User model for business owners."""
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -46,7 +47,7 @@ class User(Base):
     hashed_password = Column(String(255), nullable=False)
     full_name = Column(String(255), nullable=False)
     phone = Column(String(20), nullable=True)
-    role = Column(Enum(UserRole), default=UserRole.CUSTOMER, nullable=False)
+    role = Column(Enum(UserRole), default=UserRole.BUSINESS_OWNER, nullable=False)
     is_active = Column(Boolean, default=True)
     is_verified = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -54,11 +55,6 @@ class User(Base):
 
     # Relationships
     businesses = relationship("Business", back_populates="owner")
-    appointments_as_customer = relationship(
-        "Appointment", 
-        back_populates="customer",
-        foreign_keys="Appointment.customer_id"
-    )
 
 
 class Business(Base):
@@ -87,6 +83,25 @@ class Business(Base):
     services = relationship("Service", back_populates="business", cascade="all, delete-orphan")
     schedules = relationship("Schedule", back_populates="business", cascade="all, delete-orphan")
     appointments = relationship("Appointment", back_populates="business", cascade="all, delete-orphan")
+    clients = relationship("Client", back_populates="business", cascade="all, delete-orphan")
+
+
+class Client(Base):
+    """Client contact model — clients are not system users, just contact records."""
+    __tablename__ = "clients"
+
+    id = Column(Integer, primary_key=True, index=True)
+    business_id = Column(Integer, ForeignKey("businesses.id"), nullable=False)
+    name = Column(String(255), nullable=False)
+    email = Column(String(255), nullable=True)
+    phone = Column(String(50), nullable=True)
+    notes = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    business = relationship("Business", back_populates="clients")
+    appointments = relationship("Appointment", back_populates="client")
 
 
 class Service(Base):
@@ -126,38 +141,51 @@ class Schedule(Base):
 
 
 class Appointment(Base):
-    """Appointment model for booking appointments."""
+    """Appointment model — created by business owners to log client appointments."""
     __tablename__ = "appointments"
 
     id = Column(Integer, primary_key=True, index=True)
     business_id = Column(Integer, ForeignKey("businesses.id"), nullable=False)
-    customer_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    service_id = Column(Integer, ForeignKey("services.id"), nullable=False)
+    client_id = Column(Integer, ForeignKey("clients.id"), nullable=True)
+    service_id = Column(Integer, ForeignKey("services.id"), nullable=True)
+    # Free-text service description (used when service_id is not provided)
+    service_name = Column(String(255), nullable=True)
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=False)
-    status = Column(Enum(AppointmentStatus), default=AppointmentStatus.PENDING)
+    status = Column(Enum(AppointmentStatus), default=AppointmentStatus.CONFIRMED)
     notes = Column(Text, nullable=True)
-    customer_notes = Column(Text, nullable=True)
     cancellation_reason = Column(Text, nullable=True)
+    # JSON string: {"email": true, "sms": false, "whatsapp": true}
+    notification_channels = Column(
+        Text, nullable=True,
+        default='{"email":true,"sms":false,"whatsapp":false}'
+    )
+    reschedule_token = Column(String(64), nullable=True, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
     business = relationship("Business", back_populates="appointments")
-    customer = relationship("User", back_populates="appointments_as_customer")
+    client = relationship("Client", back_populates="appointments")
     service = relationship("Service", back_populates="appointments")
+    notification_logs = relationship("NotificationLog", back_populates="appointment")
 
 
-class Notification(Base):
-    """Notification log model for tracking sent notifications."""
-    __tablename__ = "notifications"
+class NotificationLog(Base):
+    """Notification history — tracks every notification sent for an appointment."""
+    __tablename__ = "notification_logs"
 
     id = Column(Integer, primary_key=True, index=True)
-    appointment_id = Column(Integer, ForeignKey("appointments.id"), nullable=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    notification_type = Column(String(50), nullable=False)  # email, sms
+    appointment_id = Column(Integer, ForeignKey("appointments.id"), nullable=False)
+    channel = Column(String(20), nullable=False)  # email, sms, whatsapp
+    notification_type = Column(String(50), nullable=False)  # confirmation, reminder_24h, reminder_1h, followup
+    recipient = Column(String(255), nullable=True)  # email address or phone number
     subject = Column(String(255), nullable=True)
     message = Column(Text, nullable=False)
     status = Column(String(20), default="pending")  # pending, sent, failed
     sent_at = Column(DateTime, nullable=True)
+    error_message = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    appointment = relationship("Appointment", back_populates="notification_logs")

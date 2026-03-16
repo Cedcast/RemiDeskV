@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
 import { AuthProvider } from './contexts/AuthContext';
@@ -6,17 +6,12 @@ import { Layout } from './components/layout';
 import { ProtectedRoute } from './components/auth';
 
 // Pages
-import HomePage from './pages/HomePage';
 import { LoginPage, RegisterPage } from './pages/auth';
-import {
-  BusinessListPage,
-  BusinessDetailPage,
-  MyAppointmentsPage,
-} from './pages/customer';
 import {
   DashboardPage,
   AppointmentsManagePage,
   BusinessManagePage,
+  ClientsPage,
 } from './pages/business';
 
 function App() {
@@ -25,27 +20,15 @@ function App() {
       <Router>
         <Toaster position="top-right" />
         <Routes>
-          {/* Public routes with Layout */}
+          {/* Redirect root to dashboard */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+          {/* Business owner protected routes */}
           <Route element={<Layout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/businesses" element={<BusinessListPage />} />
-            <Route path="/businesses/:id" element={<BusinessDetailPage />} />
-            
-            {/* Customer protected routes */}
-            <Route
-              path="/my-appointments"
-              element={
-                <ProtectedRoute>
-                  <MyAppointmentsPage />
-                </ProtectedRoute>
-              }
-            />
-            
-            {/* Business owner protected routes */}
             <Route
               path="/dashboard"
               element={
-                <ProtectedRoute requireBusinessOwner>
+                <ProtectedRoute>
                   <DashboardPage />
                 </ProtectedRoute>
               }
@@ -53,7 +36,7 @@ function App() {
             <Route
               path="/dashboard/appointments"
               element={
-                <ProtectedRoute requireBusinessOwner>
+                <ProtectedRoute>
                   <AppointmentsManagePage />
                 </ProtectedRoute>
               }
@@ -61,16 +44,27 @@ function App() {
             <Route
               path="/dashboard/business"
               element={
-                <ProtectedRoute requireBusinessOwner>
+                <ProtectedRoute>
                   <BusinessManagePage />
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/dashboard/clients"
+              element={
+                <ProtectedRoute>
+                  <ClientsPage />
+                </ProtectedRoute>
+              }
+            />
           </Route>
-          
+
           {/* Auth routes without Layout */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+
+          {/* Catch-all: redirect to dashboard */}
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Router>
     </AuthProvider>

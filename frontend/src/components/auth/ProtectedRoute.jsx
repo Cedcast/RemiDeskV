@@ -2,8 +2,8 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { FullPageLoading } from '../common/Loading';
 
-export const ProtectedRoute = ({ children, requireBusinessOwner = false }) => {
-  const { isAuthenticated, isBusinessOwner, loading } = useAuth();
+export const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -12,10 +12,6 @@ export const ProtectedRoute = ({ children, requireBusinessOwner = false }) => {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-
-  if (requireBusinessOwner && !isBusinessOwner()) {
-    return <Navigate to="/businesses" replace />;
   }
 
   return children;

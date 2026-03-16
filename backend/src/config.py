@@ -18,22 +18,26 @@ class Settings(BaseSettings):
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
     
-    # Twilio (SMS Notifications)
+    # Twilio (SMS & WhatsApp Notifications)
     twilio_account_sid: Optional[str] = None
     twilio_auth_token: Optional[str] = None
     twilio_phone_number: Optional[str] = None
-    
+    twilio_whatsapp_number: Optional[str] = None  # e.g. "whatsapp:+14155238886"
+
     # SendGrid (Email Notifications)
     sendgrid_api_key: Optional[str] = None
     from_email: str = "noreply@example.com"
-    
+
     # Stripe (Payments)
     stripe_secret_key: Optional[str] = None
     stripe_publishable_key: Optional[str] = None
     stripe_webhook_secret: Optional[str] = None
-    
-    # Frontend URL (for CORS)
+
+    # Frontend URL (for CORS and reschedule links)
     frontend_url: str = "http://localhost:5173"
+
+    # Base URL used in notification links
+    app_base_url: str = "http://localhost:5173"
 
     class Config:
         env_file = ".env"

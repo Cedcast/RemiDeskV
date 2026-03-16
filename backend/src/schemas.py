@@ -1,6 +1,6 @@
 """Pydantic schemas for API request/response validation."""
 from datetime import datetime, time
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, EmailStr, validator
 from .models import UserRole, AppointmentStatus
 
@@ -29,9 +29,9 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    """Schema for creating a new user."""
+    """Schema for creating a new user (always business_owner)."""
     password: str
-    role: UserRole = UserRole.CUSTOMER
+    role: UserRole = UserRole.BUSINESS_OWNER
 
     @validator('password')
     def password_min_length(cls, v):
@@ -123,6 +123,48 @@ class BusinessListResponse(BaseModel):
     size: int
 
 
+# ============ Client Schemas ============
+
+class ClientBase(BaseModel):
+    """Base client schema."""
+    name: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    notes: Optional[str] = None
+
+
+class ClientCreate(ClientBase):
+    """Schema for creating a new client."""
+    business_id: int
+
+
+class ClientUpdate(BaseModel):
+    """Schema for updating a client."""
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    notes: Optional[str] = None
+
+
+class ClientResponse(ClientBase):
+    """Schema for client response."""
+    id: int
+    business_id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class ClientListResponse(BaseModel):
+    """Schema for listing clients with pagination."""
+    clients: List[ClientResponse]
+    total: int
+    page: int
+    size: int
+
+
 # ============ Service Schemas ============
 
 class ServiceBase(BaseModel):
@@ -196,25 +238,51 @@ class ScheduleResponse(ScheduleBase):
         orm_mode = True
 
 
+# ============ Notification Channel Schemas ============
+
+class NotificationChannels(BaseModel):
+    """Notification channel preferences."""
+    email: bool = True
+    sms: bool = False
+    whatsapp: bool = False
+
+
 # ============ Appointment Schemas ============
 
 class AppointmentBase(BaseModel):
     """Base appointment schema."""
-    service_id: int
     start_time: datetime
-    customer_notes: Optional[str] = None
+    end_time: datetime
+    notes: Optional[str] = None
 
 
 class AppointmentCreate(AppointmentBase):
-    """Schema for creating a new appointment."""
+    """Schema for creating a new appointment (business owner only)."""
     business_id: int
+    # Client can be referenced by ID or provided inline (creates/updates client record)
+    client_id: Optional[int] = None
+    client_name: Optional[str] = None
+    client_email: Optional[str] = None
+    client_phone: Optional[str] = None
+    # Service can be referenced by ID or provided as free text
+    service_id: Optional[int] = None
+    service_name: Optional[str] = None
+    notification_channels: NotificationChannels = NotificationChannels()
+
+    @validator('end_time')
+    def end_after_start(cls, v, values):
+        if 'start_time' in values and v <= values['start_time']:
+            raise ValueError('end_time must be after start_time')
+        return v
 
 
 class AppointmentUpdate(BaseModel):
     """Schema for updating an appointment."""
     start_time: Optional[datetime] = None
+    end_time: Optional[datetime] = None
+    service_name: Optional[str] = None
     notes: Optional[str] = None
-    customer_notes: Optional[str] = None
+    notification_channels: Optional[NotificationChannels] = None
 
 
 class AppointmentStatusUpdate(BaseModel):
@@ -227,14 +295,16 @@ class AppointmentResponse(BaseModel):
     """Schema for appointment response."""
     id: int
     business_id: int
-    customer_id: int
-    service_id: int
+    client_id: Optional[int]
+    service_id: Optional[int]
+    service_name: Optional[str]
     start_time: datetime
     end_time: datetime
     status: AppointmentStatus
     notes: Optional[str]
-    customer_notes: Optional[str]
     cancellation_reason: Optional[str]
+    notification_channels: Optional[str]
+    reschedule_token: Optional[str]
     created_at: datetime
 
     class Config:
@@ -244,8 +314,8 @@ class AppointmentResponse(BaseModel):
 class AppointmentDetailResponse(AppointmentResponse):
     """Schema for detailed appointment response with related data."""
     business: BusinessResponse
-    service: ServiceResponse
-    customer: UserResponse
+    client: Optional[ClientResponse]
+    service: Optional[ServiceResponse]
 
     class Config:
         orm_mode = True
@@ -273,13 +343,35 @@ class AvailableSlotsResponse(BaseModel):
     slots: List[TimeSlot]
 
 
-# ============ Dashboard Schemas ============
+# ============ Dashboard / Analytics Schemas ============
+
+class StatusBreakdown(BaseModel):
+    """Appointment count by status."""
+    pending: int = 0
+    confirmed: int = 0
+    completed: int = 0
+    cancelled: int = 0
+    no_show: int = 0
+    rescheduled: int = 0
+
+
+class MonthlyCount(BaseModel):
+    """Appointment count for a specific month."""
+    month: str  # e.g. "2026-03"
+    count: int
+
 
 class DashboardStats(BaseModel):
     """Schema for dashboard statistics."""
     total_appointments: int
+    this_month_appointments: int
+    this_year_appointments: int
     upcoming_appointments: int
+    past_appointments: int
     completed_appointments: int
     cancelled_appointments: int
-    total_revenue: float
-    total_customers: int
+    rescheduled_appointments: int
+    status_breakdown: StatusBreakdown
+    total_clients: int
+    average_duration_minutes: float
+    monthly_trend: List[MonthlyCount]

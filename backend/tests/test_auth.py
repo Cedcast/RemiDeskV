@@ -6,14 +6,14 @@ class TestRegistration:
     """Tests for user registration."""
 
     def test_register_customer_success(self, client, test_user_data):
-        """Test successful customer registration."""
+        """Test successful registration always creates business_owner in B2B SaaS."""
         response = client.post("/api/auth/register", json=test_user_data)
         
         assert response.status_code == 201
         data = response.json()
         assert data["email"] == test_user_data["email"]
         assert data["full_name"] == test_user_data["full_name"]
-        assert data["role"] == "customer"
+        assert data["role"] == "business_owner"
         assert "id" in data
         assert "hashed_password" not in data
 
