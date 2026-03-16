@@ -1,3 +1,4 @@
+import os
 from pydantic import BaseSettings
 from typing import Optional
 
@@ -9,7 +10,7 @@ class Settings(BaseSettings):
     app_env: str = "development"
     debug: bool = True
     
-    # Database
+    # Database - supports both SQLite (dev) and PostgreSQL (prod)
     database_url: str = "sqlite:///./app.db"
     
     # JWT Authentication
@@ -30,10 +31,19 @@ class Settings(BaseSettings):
     stripe_secret_key: Optional[str] = None
     stripe_publishable_key: Optional[str] = None
     stripe_webhook_secret: Optional[str] = None
+    
+    # Frontend URL (for CORS)
+    frontend_url: str = "http://localhost:5173"
 
     class Config:
         env_file = ".env"
         case_sensitive = False
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Fix Render's DATABASE_URL format (postgres:// -> postgresql://)
+        if self.database_url.startswith("postgres://"):
+            self.database_url = self.database_url.replace("postgres://", "postgresql://", 1)
 
 
 settings = Settings()

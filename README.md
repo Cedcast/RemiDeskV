@@ -201,6 +201,72 @@ npm run lint
 - `GET /api/appointments/upcoming` - Get upcoming appointments
 - `GET /api/appointments/dashboard/stats` - Get dashboard statistics
 
+## Deployment
+
+### Deploy to Render (Recommended)
+
+This project includes a `render.yaml` Blueprint for easy deployment to [Render](https://render.com).
+
+#### One-Click Deployment
+
+1. Fork this repository to your GitHub account
+2. Go to [Render Dashboard](https://dashboard.render.com)
+3. Click "New" → "Blueprint"
+4. Connect your GitHub account and select the forked repository
+5. Render will automatically detect `render.yaml` and create:
+   - **appointment-api**: Backend API service
+   - **appointment-frontend**: Frontend static site
+   - **appointment-db**: PostgreSQL database
+
+#### Manual Deployment
+
+If you prefer to deploy services manually:
+
+**Backend API:**
+1. Create a new "Web Service" on Render
+2. Connect your repository
+3. Set:
+   - **Build Command**: `cd backend && pip install -r requirements.txt && alembic upgrade head`
+   - **Start Command**: `cd backend && gunicorn src.main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT`
+   - **Environment Variables**:
+     - `APP_ENV=production`
+     - `SECRET_KEY` (generate a secure key)
+     - `DATABASE_URL` (from your PostgreSQL database)
+     - `FRONTEND_URL` (your frontend URL for CORS)
+
+**Frontend:**
+1. Create a new "Static Site" on Render
+2. Connect your repository
+3. Set:
+   - **Build Command**: `cd frontend && npm install && npm run build`
+   - **Publish Directory**: `frontend/dist`
+   - **Environment Variables**:
+     - `VITE_API_URL` (your backend API URL, e.g., `https://appointment-api.onrender.com/api`)
+   - Add a rewrite rule: `/* → /index.html` (for SPA routing)
+
+**Database:**
+1. Create a new PostgreSQL database on Render
+2. Copy the Internal Database URL
+3. Add it as `DATABASE_URL` to your backend service
+
+#### Post-Deployment Configuration
+
+After deployment, configure optional integrations in Render dashboard:
+
+1. **Twilio** (SMS notifications):
+   - `TWILIO_ACCOUNT_SID`
+   - `TWILIO_AUTH_TOKEN`
+   - `TWILIO_PHONE_NUMBER`
+
+2. **SendGrid** (Email notifications):
+   - `SENDGRID_API_KEY`
+   - `FROM_EMAIL`
+
+3. **Stripe** (Payments):
+   - `STRIPE_SECRET_KEY`
+   - `STRIPE_PUBLISHABLE_KEY`
+   - `STRIPE_WEBHOOK_SECRET`
+
 ## Development
 
 ### Database Migrations
