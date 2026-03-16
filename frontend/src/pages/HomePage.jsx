@@ -1,0 +1,207 @@
+import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import {
+  CalendarIcon,
+  ClockIcon,
+  UserGroupIcon,
+  ChartBarIcon,
+  CheckCircleIcon,
+} from '@heroicons/react/24/outline';
+
+const features = [
+  {
+    name: 'Easy Booking',
+    description:
+      'Customers can easily find and book appointments with your business online, 24/7.',
+    icon: CalendarIcon,
+  },
+  {
+    name: 'Schedule Management',
+    description:
+      'Set your availability, manage services, and control your business hours effortlessly.',
+    icon: ClockIcon,
+  },
+  {
+    name: 'Customer Management',
+    description:
+      'Keep track of your customers, appointments, and build lasting relationships.',
+    icon: UserGroupIcon,
+  },
+  {
+    name: 'Business Analytics',
+    description:
+      'Track your performance with insights into bookings, revenue, and customer trends.',
+    icon: ChartBarIcon,
+  },
+];
+
+const HomePage = () => {
+  const { isAuthenticated, isBusinessOwner } = useAuth();
+
+  return (
+    <div className="bg-gray-50">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+          <div className="text-center">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 tracking-tight">
+              Simplify Your
+              <span className="text-indigo-600"> Appointment</span>
+              <br />
+              Scheduling
+            </h1>
+            <p className="mt-6 text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
+              The all-in-one platform for B2B appointment scheduling. Perfect for
+              micro businesses across the UK, Canada, and Australia.
+            </p>
+            <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+              {isAuthenticated ? (
+                isBusinessOwner() ? (
+                  <Link
+                    to="/dashboard"
+                    className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+                  >
+                    Go to Dashboard
+                  </Link>
+                ) : (
+                  <Link
+                    to="/businesses"
+                    className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+                  >
+                    Find Services
+                  </Link>
+                )
+              ) : (
+                <>
+                  <Link
+                    to="/register"
+                    className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+                  >
+                    Get Started Free
+                  </Link>
+                  <Link
+                    to="/businesses"
+                    className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
+                  >
+                    Browse Services
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <div className="bg-white py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-gray-900">
+              Everything You Need to Manage Appointments
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Powerful features to streamline your business operations
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature) => (
+              <div
+                key={feature.name}
+                className="p-6 bg-gray-50 rounded-xl hover:shadow-lg transition-shadow"
+              >
+                <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
+                  <feature.icon className="h-6 w-6 text-indigo-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {feature.name}
+                </h3>
+                <p className="text-gray-600">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Benefits Section */}
+      <div className="py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">
+                For Business Owners
+              </h2>
+              <ul className="space-y-4">
+                {[
+                  'Accept online bookings 24/7',
+                  'Reduce no-shows with automated reminders',
+                  'Manage multiple services and staff',
+                  'Track revenue and customer insights',
+                  'Customize your availability',
+                ].map((benefit) => (
+                  <li key={benefit} className="flex items-start">
+                    <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
+                    <span className="text-gray-700">{benefit}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="mt-12 lg:mt-0">
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">
+                For Customers
+              </h2>
+              <ul className="space-y-4">
+                {[
+                  'Book appointments anytime, anywhere',
+                  'View real-time availability',
+                  'Get confirmation and reminder notifications',
+                  'Easy rescheduling and cancellation',
+                  'No phone calls needed',
+                ].map((benefit) => (
+                  <li key={benefit} className="flex items-start">
+                    <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
+                    <span className="text-gray-700">{benefit}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="bg-indigo-600 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Ready to Streamline Your Bookings?
+          </h2>
+          <p className="text-indigo-100 mb-8 text-lg">
+            Join thousands of businesses already using BookIt
+          </p>
+          <Link
+            to="/register"
+            className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-indigo-600 bg-white rounded-lg hover:bg-indigo-50 transition-colors"
+          >
+            Start Free Today
+          </Link>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex items-center text-white mb-4 md:mb-0">
+              <CalendarIcon className="h-8 w-8 text-indigo-400" />
+              <span className="ml-2 text-xl font-bold">BookIt</span>
+            </div>
+            <p className="text-gray-400 text-sm">
+              © 2024 BookIt. B2B Appointment SaaS for micro businesses.
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default HomePage;

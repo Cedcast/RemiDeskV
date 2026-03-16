@@ -1,4 +1,5 @@
 """Main FastAPI application entry point."""
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -18,15 +19,25 @@ app = FastAPI(
     title=settings.app_name,
     description="B2B Appointment Scheduling SaaS API",
     version="1.0.0",
-    docs_url="/api/docs",
-    redoc_url="/api/redoc",
-    openapi_url="/api/openapi.json"
+    docs_url="/api/docs" if settings.app_env != "production" else None,
+    redoc_url="/api/redoc" if settings.app_env != "production" else None,
+    openapi_url="/api/openapi.json" if settings.app_env != "production" else None
 )
 
-# Configure CORS
+# Configure CORS - use specific origins in production
+def get_allowed_origins():
+    if settings.app_env == "production":
+        origins = [settings.frontend_url]
+        # Also allow Render preview URLs
+        render_service_name = os.environ.get("RENDER_SERVICE_NAME", "")
+        if render_service_name:
+            origins.append(f"https://{render_service_name}.onrender.com")
+        return origins
+    return ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify allowed origins
+    allow_origins=get_allowed_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -44,14 +55,20 @@ async def root():
     """Root endpoint."""
     return {
         "message": f"Welcome to {settings.app_name}",
-        "docs": "/api/docs",
+        "docs": "/api/docs" if settings.app_env != "production" else None,
         "version": "1.0.0"
     }
 
 
-@app.get("/api/health")
+@app.get("/health")
 async def health_check():
-    """Health check endpoint."""
+    """Health check endpoint for Render."""
+    return {"status": "healthy", "app": settings.app_name}
+
+
+@app.get("/api/health")
+async def api_health_check():
+    """API health check endpoint."""
     return {"status": "healthy", "app": settings.app_name}
 
 
