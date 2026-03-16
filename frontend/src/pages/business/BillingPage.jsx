@@ -55,7 +55,7 @@ const BillingPage = () => {
     } else if (paypalStatus === 'cancel') {
       toast.error('PayPal payment cancelled.');
     }
-  }, []);
+  }, [location.search]);
 
   const capturePayPalOrder = async (orderId) => {
     try {
@@ -99,7 +99,7 @@ const BillingPage = () => {
       setCheckoutTier(location.state.upgradeToTier);
       setCheckoutOpen(true);
     }
-  }, []);
+  }, [location.state]);
 
   const handleStartTrial = async () => {
     try {
@@ -241,7 +241,7 @@ const BillingPage = () => {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2">
                 <div className="bg-gray-50 rounded-lg p-3 text-center">
                   <p className="text-lg font-bold text-gray-900">
-                    {subscription.limits.appointments_per_month ?? '∞'}
+                    {subscription.limits.appointments_per_month ?? 'Unlimited'}
                   </p>
                   <p className="text-xs text-gray-500">Appts/month</p>
                 </div>

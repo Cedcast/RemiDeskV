@@ -16,7 +16,7 @@ const PRICES = {
 };
 
 // Stripe form inner component (must be inside Elements provider)
-const StripeCheckoutForm = ({ tier, currency, onSuccess, onClose }) => {
+const StripeCheckoutForm = ({ tier, tierLabel, currency, onSuccess, onClose }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
@@ -49,7 +49,7 @@ const StripeCheckoutForm = ({ tier, currency, onSuccess, onClose }) => {
         payment_method_id: paymentMethod.id,
       });
 
-      toast.success(`Successfully upgraded to ${tier.charAt(0).toUpperCase() + tier.slice(1)}!`);
+      toast.success(`Successfully upgraded to ${tierLabel}!`);
       onSuccess(response.data.subscription);
     } catch (err) {
       const msg = err.response?.data?.detail || 'Payment failed. Please try again.';
@@ -214,6 +214,7 @@ const CheckoutModal = ({ isOpen, onClose, tier, currency = 'USD', onSuccess }) =
               <Elements stripe={stripePromise}>
                 <StripeCheckoutForm
                   tier={tier}
+                  tierLabel={tierLabel}
                   currency={currency}
                   onSuccess={onSuccess}
                   onClose={onClose}
