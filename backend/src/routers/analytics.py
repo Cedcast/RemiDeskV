@@ -1,6 +1,6 @@
 """Analytics routes — business owner dashboard statistics."""
 from typing import Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from collections import defaultdict
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
@@ -43,7 +43,7 @@ async def get_analytics_stats(
             for b in db.query(Business).filter(Business.owner_id == current_user.id).all()
         ]
 
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     year_start = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
 

@@ -67,7 +67,7 @@ async def _send_notifications(appointment: Appointment, notification_type: str, 
             recipient=recipient,
             message=message,
             status="sent" if success else "failed",
-            sent_at=datetime.utcnow() if success else None,
+            sent_at=datetime.now(timezone.utc) if success else None,
         )
         db.add(log)
         db.commit()
@@ -243,7 +243,7 @@ async def get_upcoming_appointments(
 ):
     """Get upcoming appointments for the business owner."""
     _require_business_owner(current_user)
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
 
     owned_business_ids = [
         b.id for b in db.query(Business).filter(Business.owner_id == current_user.id).all()

@@ -34,18 +34,32 @@ const STATUS_COLORS = {
   rescheduled: '#8b5cf6',
 };
 
-const StatCard = ({ title, value, icon: Icon, color = 'indigo', subtitle }) => (
-  <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-start gap-4">
-    <div className={`p-3 rounded-lg bg-${color}-50`}>
-      <Icon className={`h-6 w-6 text-${color}-600`} />
+const CARD_COLORS = {
+  indigo: { bg: 'bg-indigo-50', text: 'text-indigo-600' },
+  blue: { bg: 'bg-blue-50', text: 'text-blue-600' },
+  amber: { bg: 'bg-amber-50', text: 'text-amber-600' },
+  green: { bg: 'bg-green-50', text: 'text-green-600' },
+  red: { bg: 'bg-red-50', text: 'text-red-600' },
+  purple: { bg: 'bg-purple-50', text: 'text-purple-600' },
+  teal: { bg: 'bg-teal-50', text: 'text-teal-600' },
+  gray: { bg: 'bg-gray-50', text: 'text-gray-600' },
+};
+
+const StatCard = ({ title, value, icon: Icon, color = 'indigo', subtitle }) => {
+  const { bg, text } = CARD_COLORS[color] || CARD_COLORS.indigo;
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-start gap-4">
+      <div className={`p-3 rounded-lg ${bg}`}>
+        <Icon className={`h-6 w-6 ${text}`} />
+      </div>
+      <div>
+        <p className="text-sm text-gray-500">{title}</p>
+        <p className="text-2xl font-bold text-gray-900">{value}</p>
+        {subtitle && <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>}
+      </div>
     </div>
-    <div>
-      <p className="text-sm text-gray-500">{title}</p>
-      <p className="text-2xl font-bold text-gray-900">{value}</p>
-      {subtitle && <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>}
-    </div>
-  </div>
-);
+  );
+};
 
 const DashboardPage = () => {
   const [stats, setStats] = useState(null);
