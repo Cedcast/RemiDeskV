@@ -12,7 +12,10 @@ import {
   AppointmentsManagePage,
   BusinessManagePage,
   ClientsPage,
+  BillingPage,
 } from './pages/business';
+import HomePage from './pages/HomePage';
+import PricingPage from './pages/PricingPage';
 
 function App() {
   return (
@@ -20,8 +23,9 @@ function App() {
       <Router>
         <Toaster position="top-right" />
         <Routes>
-          {/* Redirect root to dashboard */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          {/* Public pages */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/pricing" element={<PricingPage />} />
 
           {/* Business owner protected routes */}
           <Route element={<Layout />}>
@@ -57,14 +61,22 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/dashboard/billing"
+              element={
+                <ProtectedRoute>
+                  <BillingPage />
+                </ProtectedRoute>
+              }
+            />
           </Route>
 
           {/* Auth routes without Layout */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
-          {/* Catch-all: redirect to dashboard */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          {/* Catch-all: redirect to home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </AuthProvider>

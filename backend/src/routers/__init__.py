@@ -7,6 +7,7 @@ from .availability import router as availability_router
 from .appointments import router as appointments_router
 from .clients import router as clients_router
 from .analytics import router as analytics_router
+from .subscriptions import router as subscriptions_router
 
 __all__ = [
     "auth_router",
@@ -17,4 +18,5 @@ __all__ = [
     "appointments_router",
     "clients_router",
     "analytics_router",
+    "subscriptions_router",
 ]

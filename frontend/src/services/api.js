@@ -96,4 +96,15 @@ export const availabilityAPI = {
     api.get(`/availability/slots/${businessId}`, { params }),
 };
 
+// Billing / Subscriptions API
+export const billingAPI = {
+  getPricing: (currency = 'USD') => api.get('/subscriptions/pricing', { params: { currency } }),
+  getCurrencies: () => api.get('/subscriptions/pricing/currencies'),
+  startTrial: (data) => api.post('/subscriptions/trial', data),
+  getCurrent: () => api.get('/subscriptions/current'),
+  upgrade: (data) => api.post('/subscriptions/upgrade', data),
+  cancel: (data) => api.post('/subscriptions/cancel', data),
+  getPayments: () => api.get('/subscriptions/payments'),
+};
+
 export default api;
