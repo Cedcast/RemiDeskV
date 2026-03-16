@@ -1,0 +1,11 @@
+FastAPI
+SQLAlchemy
+Pydantic
+Alembic
+Twilio
+SendGrid
+Stripe
+APScheduler
+python-jose
+passlib
+# Other dependencies can be added as needed
