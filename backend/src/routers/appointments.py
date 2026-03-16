@@ -263,45 +263,6 @@ async def get_upcoming_appointments(
     return appointments
 
 
-@router.get("/reschedule/{token}", response_model=AppointmentDetailResponse)
-async def get_appointment_by_reschedule_token(
-    token: str,
-    db: Session = Depends(get_db),
-):
-    """Public endpoint — look up an appointment via its reschedule token (no auth required)."""
-    appointment = db.query(Appointment).filter(Appointment.reschedule_token == token).first()
-    if not appointment:
-        raise HTTPException(status_code=404, detail="Invalid reschedule link")
-    return appointment
-
-
-@router.post("/reschedule/{token}", response_model=AppointmentResponse)
-async def reschedule_appointment_by_token(
-    token: str,
-    update: AppointmentUpdate,
-    db: Session = Depends(get_db),
-):
-    """Public endpoint — client reschedules via link (no auth required)."""
-    appointment = db.query(Appointment).filter(Appointment.reschedule_token == token).first()
-    if not appointment:
-        raise HTTPException(status_code=404, detail="Invalid reschedule link")
-
-    if update.start_time:
-        appointment.start_time = update.start_time
-    if update.end_time:
-        appointment.end_time = update.end_time
-    if update.notes:
-        appointment.notes = update.notes
-
-    appointment.status = AppointmentStatus.RESCHEDULED
-    # Rotate token after use
-    appointment.reschedule_token = secrets.token_urlsafe(32)
-
-    db.commit()
-    db.refresh(appointment)
-    return appointment
-
-
 @router.get("/{appointment_id}", response_model=AppointmentDetailResponse)
 async def get_appointment(
     appointment_id: int,

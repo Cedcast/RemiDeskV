@@ -10,9 +10,9 @@ import {
 
 const features = [
   {
-    name: 'Easy Booking',
+    name: 'Phone Appointment Entry',
     description:
-      'Customers can easily find and book appointments with your business online, 24/7.',
+      'Take appointments by phone and enter them directly into your dashboard — quick and simple.',
     icon: CalendarIcon,
   },
   {
@@ -30,13 +30,13 @@ const features = [
   {
     name: 'Business Analytics',
     description:
-      'Track your performance with insights into bookings, revenue, and customer trends.',
+      'Track your performance with insights into appointments, revenue, and customer trends.',
     icon: ChartBarIcon,
   },
 ];
 
 const HomePage = () => {
-  const { isAuthenticated, isBusinessOwner } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="bg-gray-50">
@@ -48,29 +48,21 @@ const HomePage = () => {
               Simplify Your
               <span className="text-indigo-600"> Appointment</span>
               <br />
-              Scheduling with RemiDesk
+              Management with RemiDesk
             </h1>
             <p className="mt-6 text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
-              The all-in-one appointment reminder platform for businesses across the UK, Canada,
-              and Australia. Start your 7-day free trial — no credit card needed.
+              The phone-based appointment management platform for businesses across the UK, Canada,
+              and Australia. Take appointments by phone, then let RemiDesk handle the reminders.
+              Start your 7-day free trial — no credit card needed.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
               {isAuthenticated ? (
-                isBusinessOwner() ? (
-                  <Link
-                    to="/dashboard"
-                    className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
-                  >
-                    Go to Dashboard
-                  </Link>
-                ) : (
-                  <Link
-                    to="/businesses"
-                    className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
-                  >
-                    Find Services
-                  </Link>
-                )
+                <Link
+                  to="/dashboard"
+                  className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+                >
+                  Go to Dashboard
+                </Link>
               ) : (
                 <>
                   <Link
@@ -212,45 +204,24 @@ const HomePage = () => {
       {/* Benefits Section */}
       <div className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                For Business Owners
-              </h2>
-              <ul className="space-y-4">
-                {[
-                  'Accept online bookings 24/7',
-                  'Reduce no-shows with automated reminders',
-                  'Manage multiple services and staff',
-                  'Track revenue and customer insights',
-                  'Customize your availability',
-                ].map((benefit) => (
-                  <li key={benefit} className="flex items-start">
-                    <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                    <span className="text-gray-700">{benefit}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="mt-12 lg:mt-0">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                For Customers
-              </h2>
-              <ul className="space-y-4">
-                {[
-                  'Book appointments anytime, anywhere',
-                  'View real-time availability',
-                  'Get confirmation and reminder notifications',
-                  'Easy rescheduling and cancellation',
-                  'No phone calls needed',
-                ].map((benefit) => (
-                  <li key={benefit} className="flex items-start">
-                    <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                    <span className="text-gray-700">{benefit}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">
+              Built for Phone-Based Appointment Businesses
+            </h2>
+            <ul className="space-y-4">
+              {[
+                'Take appointments by phone and enter them in seconds',
+                'Reduce no-shows with automated SMS, Email & WhatsApp reminders',
+                'Manage multiple services and customer records',
+                'Track revenue and appointment trends',
+                'Customize your availability and working hours',
+              ].map((benefit) => (
+                <li key={benefit} className="flex items-start">
+                  <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
+                  <span className="text-gray-700">{benefit}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
@@ -259,7 +230,7 @@ const HomePage = () => {
       <div className="bg-indigo-600 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to Streamline Your Bookings?
+            Ready to Streamline Your Appointment Management?
           </h2>
           <p className="text-indigo-100 mb-2 text-lg">
             Join businesses across the UK, Canada, and Australia already using RemiDesk

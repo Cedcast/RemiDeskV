@@ -1,6 +1,6 @@
 # B2B Appointment SaaS
 
-A comprehensive B2B appointment scheduling platform designed for micro businesses in the UK, Canada, and Australia. This full-stack application enables businesses to manage their services, availability, and appointments while allowing customers to easily discover and book services.
+A phone-based B2B appointment management platform designed for micro businesses in the UK, Canada, and Australia. Business owners take appointments by phone and manage them through this admin dashboard, while customers receive automated reminders by SMS, Email, and WhatsApp.
 
 ## Features
 
@@ -8,17 +8,12 @@ A comprehensive B2B appointment scheduling platform designed for micro businesse
 - **Business Management**: Create and manage business profiles with contact information
 - **Service Management**: Define services with customizable duration and pricing
 - **Availability Management**: Set weekly schedules and business hours
-- **Appointment Management**: View, confirm, complete, or cancel appointments
+- **Appointment Management**: Manually enter and manage phone appointments; confirm, complete, or cancel
 - **Dashboard Analytics**: Track appointments, revenue, and customer statistics
-
-### For Customers
-- **Business Discovery**: Search and filter businesses by location
-- **Service Browsing**: View available services with pricing and duration
-- **Online Booking**: Book appointments with real-time availability
-- **Appointment Management**: View, reschedule, and cancel bookings
+- **Automated Reminders**: Send SMS, Email, and WhatsApp reminders to clients automatically
 
 ### Integrations (Ready for Configuration)
-- **Twilio**: SMS notifications and reminders
+- **Twilio**: SMS and WhatsApp notifications
 - **SendGrid**: Email notifications
 - **Stripe**: Payment processing
 
@@ -70,7 +65,6 @@ B2B-appointment-SaaS/
 │   │   │   └── auth/            # Auth-related components
 │   │   ├── pages/               # Page components
 │   │   │   ├── auth/            # Login, Register
-│   │   │   ├── customer/        # Customer-facing pages
 │   │   │   └── business/        # Business dashboard pages
 │   │   ├── contexts/            # React contexts
 │   │   └── services/            # API service layer
@@ -174,8 +168,6 @@ npm run lint
 - `GET /api/auth/me` - Get current user info
 
 ### Businesses
-- `GET /api/businesses` - List all businesses
-- `GET /api/businesses/{id}` - Get business details
 - `POST /api/businesses` - Create new business
 - `PUT /api/businesses/{id}` - Update business
 - `GET /api/businesses/my` - Get user's businesses
