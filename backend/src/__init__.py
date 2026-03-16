@@ -2,7 +2,7 @@
 from .config import settings
 from .database import Base, get_db, init_db
 from .models import (
-    User, Business, Service, Schedule, Appointment, Notification,
+    User, Business, Service, Schedule, Appointment, Client, NotificationLog,
     UserRole, AppointmentStatus
 )
 
@@ -16,7 +16,8 @@ __all__ = [
     "Service",
     "Schedule",
     "Appointment",
-    "Notification",
+    "Client",
+    "NotificationLog",
     "UserRole",
-    "AppointmentStatus"
+    "AppointmentStatus",
 ]

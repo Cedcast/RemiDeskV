@@ -62,14 +62,13 @@ export const serviceAPI = {
   delete: (id) => api.delete(`/services/${id}`),
 };
 
-// Availability API
-export const availabilityAPI = {
-  getSchedules: (businessId) => api.get(`/availability/schedules/${businessId}`),
-  createSchedule: (data) => api.post('/availability/schedules', data),
-  updateSchedule: (id, data) => api.put(`/availability/schedules/${id}`, data),
-  deleteSchedule: (id) => api.delete(`/availability/schedules/${id}`),
-  getSlots: (businessId, serviceId, date) => 
-    api.get(`/availability/slots/${businessId}`, { params: { service_id: serviceId, date } }),
+// Client API
+export const clientAPI = {
+  list: (params) => api.get('/clients', { params }),
+  get: (id) => api.get(`/clients/${id}`),
+  create: (data) => api.post('/clients', data),
+  update: (id, data) => api.put(`/clients/${id}`, data),
+  delete: (id) => api.delete(`/clients/${id}`),
 };
 
 // Appointment API
@@ -81,8 +80,20 @@ export const appointmentAPI = {
   updateStatus: (id, data) => api.patch(`/appointments/${id}/status`, data),
   cancel: (id) => api.delete(`/appointments/${id}`),
   getUpcoming: (limit = 10) => api.get('/appointments/upcoming', { params: { limit } }),
-  getDashboardStats: (businessId) => 
-    api.get('/appointments/dashboard/stats', { params: { business_id: businessId } }),
+};
+
+// Analytics API
+export const analyticsAPI = {
+  getStats: (businessId) =>
+    api.get('/analytics/stats', { params: businessId ? { business_id: businessId } : {} }),
+};
+
+// Availability API
+export const availabilityAPI = {
+  getByBusiness: (businessId, params) =>
+    api.get(`/availability/business/${businessId}`, { params }),
+  getSlots: (businessId, params) =>
+    api.get(`/availability/slots/${businessId}`, { params }),
 };
 
 export default api;

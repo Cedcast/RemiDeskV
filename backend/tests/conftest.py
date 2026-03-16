@@ -60,13 +60,13 @@ def client(db):
 
 @pytest.fixture
 def test_user_data():
-    """Return test user data."""
+    """Return test user data (always business_owner in B2B SaaS)."""
     return {
         "email": "test@example.com",
         "password": "testpassword123",
         "full_name": "Test User",
         "phone": "+1234567890",
-        "role": "customer"
+        "role": "business_owner"
     }
 
 
