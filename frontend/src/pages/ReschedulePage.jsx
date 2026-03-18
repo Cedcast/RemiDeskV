@@ -126,7 +126,7 @@ function AppointmentCard({ appt }) {
       )}
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-indigo-400 mb-0.5">
-          Date &amp; Time
+          Date & Time
         </p>
         <p className="text-gray-800">{formatDateTime(appt.start_time)}</p>
       </div>

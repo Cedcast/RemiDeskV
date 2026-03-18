@@ -78,17 +78,21 @@ class TestRescheduleGet:
         res = client.get("/api/reschedule/totally-invalid-token-xyz")
         assert res.status_code == 404
 
-    def test_get_cancelled_appointment_returns_conflict(self, client, appointment_with_token):
-        """Cancelled appointment returns 409 conflict."""
+    def test_get_cancelled_appointment_returns_conflict(
+        self, client, appointment_with_token, business_owner_with_token
+    ):
+        """Cancelled appointment cannot be rescheduled — returns 409."""
         token = appointment_with_token["reschedule_token"]
         appt_id = appointment_with_token["id"]
+        headers = {"Authorization": f"Bearer {business_owner_with_token}"}
 
-        # Get business owner token to cancel (we need the fixture's token)
-        # Instead, directly update the DB via the appointment's cancel endpoint
-        # — but we don't have the auth header here. Patch the DB directly.
-        # We'll use the fixture db indirectly via a known pattern.
-        # NOTE: We skip this sub-test (requires more fixture wiring) and document the behaviour.
-        pass
+        # Cancel the appointment via the authenticated endpoint
+        cancel_res = client.delete(f"/api/appointments/{appt_id}", headers=headers)
+        assert cancel_res.status_code == 204
+
+        # Reschedule portal should now refuse with 409
+        res = client.get(f"/api/reschedule/{token}")
+        assert res.status_code == 409
 
 
 class TestReschedulePost:
