@@ -7,6 +7,7 @@ import {
   ChartBarIcon,
   CheckCircleIcon,
 } from '@heroicons/react/24/outline';
+import Footer from '../components/Footer';
 
 const features = [
   {
@@ -302,24 +303,7 @@ const HomePage = () => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-900 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center text-white mb-4 md:mb-0">
-              <CalendarIcon className="h-8 w-8 text-indigo-400" />
-              <span className="ml-2 text-xl font-bold">RemiDesk</span>
-            </div>
-            <div className="flex gap-6 text-gray-400 text-sm mb-4 md:mb-0">
-              <Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link>
-              <Link to="/register" className="hover:text-white transition-colors">Free Trial</Link>
-              <Link to="/login" className="hover:text-white transition-colors">Sign In</Link>
-            </div>
-            <p className="text-gray-400 text-sm">
-              © 2024 RemiDesk. B2B Appointment SaaS for micro businesses.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

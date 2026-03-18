@@ -279,6 +279,15 @@ alembic upgrade head
 
 MIT License
 
+## Legal & Privacy
+
+- [Privacy Policy](docs/PRIVACY_POLICY.md)
+- [Legal Compliance](docs/LEGAL_COMPLIANCE.md)
+- [Security Standards](docs/SECURITY_STANDARDS.md)
+- [Data Processing Agreement](docs/DATA_PROCESSING_AGREEMENT.md)
+
+Privacy inquiries: privacy@remidesk.com
+
 ## Contributing
 
 1. Fork the repository
