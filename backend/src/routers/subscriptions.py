@@ -79,7 +79,7 @@ async def start_free_trial(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Start a 7-day free trial for the current user."""
+    """Start a 3-day free trial for the current user."""
     existing = get_subscription(db, current_user.id)
     if existing is not None:
         raise HTTPException(

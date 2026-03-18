@@ -104,7 +104,7 @@ const BillingPage = () => {
   const handleStartTrial = async () => {
     try {
       await billingAPI.startTrial({ currency });
-      toast.success('Free trial started! Enjoy 7 days of Pro features.');
+      toast.success('Free trial started! Enjoy 3 days of Pro features.');
       loadSubscription();
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Could not start trial.');

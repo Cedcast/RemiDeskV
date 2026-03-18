@@ -54,7 +54,7 @@ const HomePage = () => {
             <p className="mt-6 text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
               The phone-based appointment management platform for businesses across the UK, Canada,
               and Australia. Take appointments by phone, then let RemiDesk handle the reminders.
-              Start your 7-day free trial — no credit card needed.
+              Start your 3-day free trial — no credit card needed.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
               {isAuthenticated ? (
@@ -70,7 +70,7 @@ const HomePage = () => {
                     to="/register"
                     className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
                   >
-                    Start 7-Day Free Trial
+                    Start 3-Day Free Trial
                   </Link>
                   <Link
                     to="/pricing"
@@ -82,7 +82,7 @@ const HomePage = () => {
               )}
             </div>
             <p className="mt-4 text-sm text-gray-400">
-              🎉 7-day free trial · No credit card required · Cancel anytime
+              🎉 3-day free trial · No credit card required · Cancel anytime
             </p>
           </div>
         </div>
@@ -239,7 +239,7 @@ const HomePage = () => {
           </div>
           <p className="text-center mt-8 text-gray-500">
             All plans include a{' '}
-            <span className="font-semibold text-indigo-600">7-day free trial</span> with full Pro
+            <span className="font-semibold text-indigo-600">3-day free trial</span> with full Pro
             features.{' '}
             <Link to="/pricing" className="underline hover:text-indigo-600">
               See full comparison →
@@ -283,7 +283,7 @@ const HomePage = () => {
             Join businesses across the UK, Canada, and Australia already using RemiDesk
           </p>
           <p className="text-indigo-200 mb-8 text-sm">
-            7-day free trial · No credit card needed · Cancel anytime
+            3-day free trial · No credit card needed · Cancel anytime
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

@@ -174,7 +174,7 @@ def get_trial_days_remaining(subscription: Subscription) -> Optional[int]:
     return max(0, remaining)
 
 
-def is_trial_expiring_soon(subscription: Subscription, warn_days: int = 2) -> bool:
+def is_trial_expiring_soon(subscription: Subscription, warn_days: int = 1) -> bool:
     """Return True if trial ends within warn_days days."""
     days_left = get_trial_days_remaining(subscription)
     if days_left is None:

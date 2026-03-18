@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     openai_api_key: Optional[str] = None
 
     # Billing Settings
-    free_trial_days: int = 7
+    free_trial_days: int = 3
     app_currency_default: str = "USD"  # Default currency (USD, GBP, CAD, AUD)
 
     # Frontend URL (for CORS and reschedule links)
