@@ -406,3 +406,255 @@ class RescheduleRequest(BaseModel):
         if "new_start_time" in values and v <= values["new_start_time"]:
             raise ValueError("new_end_time must be after new_start_time")
         return v
+
+
+# ============ Admin Schemas ============
+
+class AdminPlatformStats(BaseModel):
+    """Platform-wide KPI statistics for superadmin dashboard."""
+    total_users: int
+    total_businesses: int
+    total_appointments: int
+    total_revenue_usd_cents: int
+    active_subscriptions: int
+    trial_users: int
+    notifications_sent: int
+    notifications_failed: int
+
+
+class AdminGrowthStats(BaseModel):
+    """Monthly growth trend for superadmin dashboard."""
+    monthly_signups: List[MonthlyCount]
+    monthly_businesses: List[MonthlyCount]
+    monthly_appointments: List[MonthlyCount]
+
+
+class AdminUserSummary(BaseModel):
+    """User summary used in admin user list."""
+    id: int
+    email: str
+    full_name: str
+    role: UserRole
+    is_active: bool
+    subscription_tier: Optional[str] = None
+    subscription_status: Optional[str] = None
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class AdminUserListResponse(BaseModel):
+    """Paginated user list response for admin."""
+    items: List[AdminUserSummary]
+    total: int
+    page: int
+    size: int
+
+
+class AdminUserDetail(BaseModel):
+    """Full user detail for admin view."""
+    id: int
+    email: str
+    full_name: str
+    phone: Optional[str] = None
+    role: UserRole
+    is_active: bool
+    is_verified: bool
+    suspended_at: Optional[datetime] = None
+    suspension_reason: Optional[str] = None
+    created_at: datetime
+    subscription_tier: Optional[str] = None
+    subscription_status: Optional[str] = None
+    businesses: List[Any] = []
+    recent_payments: List[Any] = []
+
+    class Config:
+        orm_mode = True
+
+
+class AdminBusinessSummary(BaseModel):
+    """Business summary used in admin business list."""
+    id: int
+    name: str
+    owner_id: int
+    owner_name: Optional[str] = None
+    owner_email: Optional[str] = None
+    city: Optional[str] = None
+    country: Optional[str] = None
+    is_active: bool
+    suspended_at: Optional[datetime] = None
+    appointment_count: int = 0
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class AdminBusinessListResponse(BaseModel):
+    """Paginated business list response for admin."""
+    items: List[AdminBusinessSummary]
+    total: int
+    page: int
+    size: int
+
+
+class AdminBusinessDetail(BaseModel):
+    """Full business detail for admin view."""
+    id: int
+    name: str
+    description: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    zip_code: Optional[str] = None
+    country: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    website: Optional[str] = None
+    timezone: Optional[str] = None
+    is_active: bool
+    suspended_at: Optional[datetime] = None
+    suspension_reason: Optional[str] = None
+    owner_id: int
+    owner_name: Optional[str] = None
+    owner_email: Optional[str] = None
+    appointment_count: int = 0
+    client_count: int = 0
+    service_count: int = 0
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class AdminSubscriptionSummary(BaseModel):
+    """Platform-wide subscription summary."""
+    free_trial_count: int
+    premium_count: int
+    pro_count: int
+    expired_count: int
+    total_mrr: Dict[str, int]  # currency -> amount in minor units
+
+
+class AdminSubscriptionItem(BaseModel):
+    """Subscription entry in admin list."""
+    id: int
+    user_id: int
+    user_name: Optional[str] = None
+    user_email: Optional[str] = None
+    tier: str
+    status: str
+    currency: str
+    trial_ends_at: Optional[datetime] = None
+    current_period_end: Optional[datetime] = None
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class AdminSubscriptionListResponse(BaseModel):
+    """Paginated subscription list for admin."""
+    items: List[AdminSubscriptionItem]
+    total: int
+    page: int
+    size: int
+
+
+class AdminPaymentItem(BaseModel):
+    """Payment entry in admin ledger."""
+    id: int
+    user_id: int
+    user_name: Optional[str] = None
+    user_email: Optional[str] = None
+    provider: str
+    status: str
+    amount: int
+    currency: str
+    description: Optional[str] = None
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class AdminPaymentListResponse(BaseModel):
+    """Paginated payment list for admin."""
+    items: List[AdminPaymentItem]
+    total: int
+    page: int
+    size: int
+
+
+class AdminRevenueStats(BaseModel):
+    """Revenue statistics for admin."""
+    monthly_revenue: List[MonthlyCount]
+    total_by_currency: Dict[str, int]
+    total_by_provider: Dict[str, int]
+
+
+class AdminNotificationStats(BaseModel):
+    """Platform-wide notification statistics."""
+    total_sent: int
+    total_failed: int
+    by_channel: Dict[str, int]
+    delivery_rate_percent: float
+
+
+class AdminNotificationItem(BaseModel):
+    """Notification log entry for admin."""
+    id: int
+    appointment_id: int
+    channel: str
+    notification_type: str
+    recipient: Optional[str] = None
+    status: str
+    sent_at: Optional[datetime] = None
+    error_message: Optional[str] = None
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class AdminNotificationListResponse(BaseModel):
+    """Paginated notification log for admin."""
+    items: List[AdminNotificationItem]
+    total: int
+    page: int
+    size: int
+
+
+class AuditLogResponse(BaseModel):
+    """Audit log entry with admin info."""
+    id: int
+    admin_id: int
+    admin_name: Optional[str] = None
+    action: str
+    target_type: str
+    target_id: int
+    details: Optional[str] = None
+    ip_address: Optional[str] = None
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class AuditLogListResponse(BaseModel):
+    """Paginated audit log response."""
+    items: List[AuditLogResponse]
+    total: int
+    page: int
+    size: int
+
+
+class SuspendRequest(BaseModel):
+    """Request body for suspend actions."""
+    reason: Optional[str] = None
+
+
+class BanUserRequest(BaseModel):
+    """Request body for ban user action."""
+    reason: Optional[str] = None

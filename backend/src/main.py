@@ -19,6 +19,7 @@ from .routers import (
     analytics_router,
     subscriptions_router,
     reschedule_router,
+    admin_router,
 )
 
 
@@ -97,3 +98,4 @@ app.include_router(clients_router, prefix="/api")
 app.include_router(analytics_router, prefix="/api")
 app.include_router(subscriptions_router, prefix="/api")
 app.include_router(reschedule_router, prefix="/api")
+app.include_router(admin_router, prefix="/api")
