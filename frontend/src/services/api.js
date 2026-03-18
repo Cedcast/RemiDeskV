@@ -107,4 +107,10 @@ export const billingAPI = {
   getPayments: () => api.get('/subscriptions/payments'),
 };
 
+// Reschedule Portal API (public, no auth required)
+export const rescheduleAPI = {
+  getInfo: (token) => api.get(`/reschedule/${token}`),
+  submit: (token, data) => api.post(`/reschedule/${token}`, data),
+};
+
 export default api;
