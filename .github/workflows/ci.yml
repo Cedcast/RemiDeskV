@@ -10,6 +10,8 @@ jobs:
   backend-tests:
     name: Backend Tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -50,6 +52,8 @@ jobs:
   frontend-lint:
     name: Frontend Lint & Build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -87,6 +91,8 @@ jobs:
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -102,7 +108,10 @@ jobs:
 
       - name: Audit Python dependencies
         working-directory: backend
-        run: pip-audit -r requirements.txt --ignore-vuln PYSEC-2022-42969 || true
+        # Using || true to avoid failing on vulnerabilities in transitive
+        # dependencies we can't immediately update (e.g. passlib/crypt).
+        # Address findings as part of ongoing security reviews.
+        run: pip-audit -r requirements.txt || true
 
       - name: Set up Node.js 20
         uses: actions/setup-node@v4
@@ -111,4 +120,7 @@ jobs:
 
       - name: Audit npm dependencies
         working-directory: frontend
+        # Using || true to avoid CI failures from upstream package vulnerabilities
+        # in Vite's peer dependencies. Address critical findings as part of
+        # ongoing security reviews.
         run: npm audit --audit-level=high || true

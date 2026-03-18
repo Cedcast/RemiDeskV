@@ -56,6 +56,8 @@ htmlcov/
 .pytest_cache/
 .tox/
 .nox/
+coverage.xml
+coverage.json
 
 # Node.js (Frontend)
 node_modules/

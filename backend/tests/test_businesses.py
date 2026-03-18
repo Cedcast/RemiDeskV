@@ -28,7 +28,7 @@ class TestCreateBusiness:
             json=test_business_data,
             headers=business_owner_headers
         )
-        
+
         assert response.status_code == 201
         data = response.json()
         assert data["name"] == test_business_data["name"]
@@ -39,7 +39,7 @@ class TestCreateBusiness:
     def test_create_business_unauthenticated(self, client, test_business_data):
         """Test creating business without authentication fails."""
         response = client.post("/api/businesses", json=test_business_data)
-        
+
         assert response.status_code == 401
 
     def test_create_business_customer_becomes_owner(self, client, auth_headers, test_business_data):
@@ -49,7 +49,7 @@ class TestCreateBusiness:
             json=test_business_data,
             headers=auth_headers
         )
-        
+
         # Customer can create business - they become business owner
         assert response.status_code == 201
         assert response.json()["name"] == test_business_data["name"]
@@ -117,6 +117,8 @@ class TestGetMyBusinesses:
         response = client.get("/api/businesses/my")
         assert response.status_code == 401
 
+
+class TestUpdateBusiness:
     """Tests for updating a business."""
 
     def test_update_business_success(self, client, business_owner_headers, test_business_data):
@@ -128,7 +130,7 @@ class TestGetMyBusinesses:
             headers=business_owner_headers
         )
         business_id = create_response.json()["id"]
-        
+
         # Update the business
         update_data = {"name": "Updated Business Name", "city": "Manchester"}
         response = client.put(
@@ -136,7 +138,7 @@ class TestGetMyBusinesses:
             json=update_data,
             headers=business_owner_headers
         )
-        
+
         assert response.status_code == 200
         data = response.json()
         assert data["name"] == "Updated Business Name"
@@ -151,12 +153,12 @@ class TestGetMyBusinesses:
             headers=business_owner_headers
         )
         business_id = create_response.json()["id"]
-        
+
         # Try to update as different user
         response = client.put(
             f"/api/businesses/{business_id}",
             json={"name": "Hacked Name"},
             headers=auth_headers
         )
-        
+
         assert response.status_code == 403

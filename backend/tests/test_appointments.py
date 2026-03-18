@@ -107,9 +107,6 @@ class TestCreateAppointment:
         """Test that end_time before start_time is rejected."""
         test_appointment_data["end_time"] = future_time(1)
         test_appointment_data["start_time"] = future_time(5)
-        # swap so end < start
-        test_appointment_data["end_time"] = future_time(1)
-        test_appointment_data["start_time"] = future_time(5)
         response = client.post(
             "/api/appointments/",
             json=test_appointment_data,
