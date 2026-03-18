@@ -17,6 +17,8 @@ import {
 import HomePage from './pages/HomePage';
 import PricingPage from './pages/PricingPage';
 import ReschedulePage from './pages/ReschedulePage';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 
 function App() {
   return (
@@ -27,6 +29,8 @@ function App() {
           {/* Public pages */}
           <Route path="/" element={<HomePage />} />
           <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
 
           {/* Public reschedule portal (token-based, no auth required) */}
           <Route path="/reschedule/:token" element={<ReschedulePage />} />
