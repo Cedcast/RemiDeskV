@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     paypal_client_secret: Optional[str] = None
     paypal_mode: str = "sandbox"  # sandbox | live
 
+    # OpenAI (AI-powered notification messages)
+    openai_api_key: Optional[str] = None
+
     # Billing Settings
     free_trial_days: int = 7
     app_currency_default: str = "USD"  # Default currency (USD, GBP, CAD, AUD)

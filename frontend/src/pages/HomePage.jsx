@@ -22,15 +22,15 @@ const features = [
     icon: ClockIcon,
   },
   {
-    name: 'Customer Management',
+    name: 'Client Management',
     description:
-      'Keep track of your customers, appointments, and build lasting relationships.',
+      'Keep track of your clients, appointments, and build lasting relationships.',
     icon: UserGroupIcon,
   },
   {
     name: 'Business Analytics',
     description:
-      'Track your performance with insights into appointments, revenue, and customer trends.',
+      'Track your performance with insights into appointments, revenue, and client trends.',
     icon: ChartBarIcon,
   },
 ];
@@ -113,6 +113,52 @@ const HomePage = () => {
                 <p className="text-gray-600">{feature.description}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* How It Works Section */}
+      <div className="py-20 bg-gray-50 border-t border-gray-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900">How RemiDesk Works</h2>
+            <p className="mt-4 text-gray-600 text-lg">
+              Built exclusively for business operators. Your clients never need to create an account.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-indigo-600">1</span>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">You take the call</h3>
+              <p className="text-gray-500 text-sm">
+                A client phones in to book. You enter the appointment directly into your RemiDesk dashboard — no app needed on their end.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-indigo-600">2</span>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">RemiDesk notifies them</h3>
+              <p className="text-gray-500 text-sm">
+                Your client automatically receives a confirmation, then 24 h and 2 h reminders by Email, SMS, or WhatsApp — with a personalised reschedule link included.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-indigo-600">3</span>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">They can reschedule — that's it</h3>
+              <p className="text-gray-500 text-sm">
+                If they need to change the time, they tap the link and pick a new slot. No account, no login — just one tap. Everything else is managed by you.
+              </p>
+            </div>
+          </div>
+          <div className="mt-10 bg-indigo-50 border border-indigo-100 rounded-2xl p-5 text-center">
+            <p className="text-indigo-800 text-sm font-medium">
+              🔒 &nbsp;RemiDesk is a <strong>business operator platform</strong>. Your clients never log in — they simply receive notifications and can optionally reschedule via a secure link.
+            </p>
           </div>
         </div>
       </div>
@@ -212,7 +258,7 @@ const HomePage = () => {
               {[
                 'Take appointments by phone and enter them in seconds',
                 'Reduce no-shows with automated SMS, Email & WhatsApp reminders',
-                'Manage multiple services and customer records',
+                'Manage multiple services and client records',
                 'Track revenue and appointment trends',
                 'Customize your availability and working hours',
               ].map((benefit) => (

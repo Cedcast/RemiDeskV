@@ -1,10 +1,13 @@
 """Main FastAPI application entry point."""
 import os
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
 from .database import init_db
+from .scheduler import start_scheduler, stop_scheduler
 from .routers import (
     auth_router,
     users_router,
@@ -15,13 +18,27 @@ from .routers import (
     clients_router,
     analytics_router,
     subscriptions_router,
+    reschedule_router,
 )
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan: start/stop background scheduler."""
+    init_db()
+    if settings.app_env != "testing":
+        start_scheduler()
+    yield
+    if settings.app_env != "testing":
+        stop_scheduler()
+
 
 # Create FastAPI application
 app = FastAPI(
     title=settings.app_name,
     description="B2B Appointment Scheduling SaaS API",
     version="1.0.0",
+    lifespan=lifespan,
     docs_url="/api/docs" if settings.app_env != "production" else None,
     redoc_url="/api/redoc" if settings.app_env != "production" else None,
     openapi_url="/api/openapi.json" if settings.app_env != "production" else None
@@ -45,12 +62,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Initialize database on startup."""
-    init_db()
 
 
 @app.get("/")
@@ -85,3 +96,4 @@ app.include_router(appointments_router, prefix="/api")
 app.include_router(clients_router, prefix="/api")
 app.include_router(analytics_router, prefix="/api")
 app.include_router(subscriptions_router, prefix="/api")
+app.include_router(reschedule_router, prefix="/api")

@@ -375,3 +375,34 @@ class DashboardStats(BaseModel):
     total_clients: int
     average_duration_minutes: float
     monthly_trend: List[MonthlyCount]
+
+
+# ============ Reschedule Portal Schemas ============
+
+class ReschedulePublicResponse(BaseModel):
+    """Public appointment info returned by the reschedule-token endpoint."""
+
+    id: int
+    business_name: str
+    service_name: Optional[str]
+    client_name: Optional[str]
+    start_time: datetime
+    end_time: datetime
+    status: AppointmentStatus
+    # Token is NOT returned to the client for security reasons
+
+    class Config:
+        orm_mode = True
+
+
+class RescheduleRequest(BaseModel):
+    """Request body for a client reschedule submission."""
+
+    new_start_time: datetime
+    new_end_time: datetime
+
+    @validator("new_end_time")
+    def end_after_start(cls, v, values):
+        if "new_start_time" in values and v <= values["new_start_time"]:
+            raise ValueError("new_end_time must be after new_start_time")
+        return v
