@@ -114,3 +114,27 @@ export const rescheduleAPI = {
 };
 
 export default api;
+
+// Admin API (superadmin only)
+export const adminAPI = {
+  getStats: () => api.get('/admin/stats'),
+  getGrowthStats: () => api.get('/admin/stats/growth'),
+  getUsers: (params) => api.get('/admin/users', { params }),
+  getUser: (id) => api.get(`/admin/users/${id}`),
+  banUser: (id, data) => api.patch(`/admin/users/${id}/ban`, data),
+  unbanUser: (id) => api.patch(`/admin/users/${id}/unban`),
+  getBusinesses: (params) => api.get('/admin/businesses', { params }),
+  getBusiness: (id) => api.get(`/admin/businesses/${id}`),
+  updateBusiness: (id, data) => api.put(`/admin/businesses/${id}`, data),
+  deleteBusiness: (id) => api.delete(`/admin/businesses/${id}`),
+  suspendBusiness: (id, data) => api.patch(`/admin/businesses/${id}/suspend`, data),
+  reinstateBusiness: (id) => api.patch(`/admin/businesses/${id}/reinstate`),
+  getSubscriptions: (params) => api.get('/admin/subscriptions', { params }),
+  getSubscriptionSummary: () => api.get('/admin/subscriptions/summary'),
+  getPayments: (params) => api.get('/admin/payments', { params }),
+  getRevenue: () => api.get('/admin/payments/revenue'),
+  getNotifications: (params) => api.get('/admin/notifications', { params }),
+  getNotificationStats: () => api.get('/admin/notifications/stats'),
+  getNotificationFailures: (params) => api.get('/admin/notifications/failures', { params }),
+  getAuditLog: (params) => api.get('/admin/audit-log', { params }),
+};

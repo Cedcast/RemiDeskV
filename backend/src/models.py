@@ -81,6 +81,8 @@ class User(Base):
     role = Column(Enum(UserRole), default=UserRole.BUSINESS_OWNER, nullable=False)
     is_active = Column(Boolean, default=True)
     is_verified = Column(Boolean, default=False)
+    suspended_at = Column(DateTime, nullable=True)
+    suspension_reason = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -108,6 +110,8 @@ class Business(Base):
     website = Column(String(255), nullable=True)
     timezone = Column(String(50), default="America/New_York")
     is_active = Column(Boolean, default=True)
+    suspended_at = Column(DateTime, nullable=True)
+    suspension_reason = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -283,3 +287,20 @@ class Payment(Base):
     # Relationships
     subscription = relationship("Subscription", back_populates="payments")
     user = relationship("User", back_populates="payments")
+
+
+class AuditLog(Base):
+    """Tracks every admin action for accountability."""
+    __tablename__ = "audit_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    admin_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    action = Column(String(100), nullable=False)       # e.g. "business_suspended", "user_banned"
+    target_type = Column(String(50), nullable=False)    # "user", "business", "subscription"
+    target_id = Column(Integer, nullable=False)
+    details = Column(Text, nullable=True)               # JSON blob with context
+    ip_address = Column(String(45), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    admin = relationship("User", foreign_keys=[admin_id])

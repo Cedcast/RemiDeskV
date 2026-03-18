@@ -94,6 +94,17 @@ async def get_current_active_user(
     return current_user
 
 
+async def require_superadmin(current_user: User = Depends(get_current_user)) -> User:
+    """Enforce superadmin-only access."""
+    from .models import UserRole
+    if current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Superadmin access required"
+        )
+    return current_user
+
+
 def get_user_by_email(db: Session, email: str) -> Optional[User]:
     """Get a user by email."""
     return db.query(User).filter(User.email == email).first()

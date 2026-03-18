@@ -28,9 +28,13 @@ const LoginPage = () => {
 
     setLoading(true);
     try {
-      await login(email, password);
+      const userData = await login(email, password);
       toast.success('Welcome back!');
-      navigate('/dashboard');
+      if (userData?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (error) {
       const message = error.response?.data?.detail || 'Invalid email or password';
       toast.error(message);
