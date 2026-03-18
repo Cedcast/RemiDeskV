@@ -297,7 +297,7 @@ async def ban_user(
         raise HTTPException(status_code=400, detail="Cannot ban yourself")
 
     user.is_active = False
-    user.suspended_at = datetime.utcnow()
+    user.suspended_at = datetime.now(timezone.utc)
     user.suspension_reason = body.reason
     db.commit()
 
@@ -510,7 +510,7 @@ async def delete_business(
         raise HTTPException(status_code=404, detail="Business not found")
 
     b.is_active = False
-    b.suspended_at = datetime.utcnow()
+    b.suspended_at = datetime.now(timezone.utc)
     db.commit()
 
     _audit(
@@ -534,7 +534,7 @@ async def suspend_business(
     if not b:
         raise HTTPException(status_code=404, detail="Business not found")
 
-    b.suspended_at = datetime.utcnow()
+    b.suspended_at = datetime.now(timezone.utc)
     b.suspension_reason = body.reason
     b.is_active = False
     db.commit()

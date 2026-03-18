@@ -2,8 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast';
 
 import { AuthProvider } from './contexts/AuthContext';
-import { Layout } from './components/layout';
-import { ProtectedRoute } from './components/auth';
+import { Layout, AdminLayout } from './components/layout';
+import { ProtectedRoute, AdminRoute } from './components/auth';
 
 // Pages
 import { LoginPage, RegisterPage } from './pages/auth';
@@ -14,6 +14,16 @@ import {
   ClientsPage,
   BillingPage,
 } from './pages/business';
+import {
+  AdminDashboardPage,
+  AdminUsersPage,
+  AdminUserDetailPage,
+  AdminBusinessesPage,
+  AdminSubscriptionsPage,
+  AdminPaymentsPage,
+  AdminNotificationsPage,
+  AdminAuditLogPage,
+} from './pages/admin';
 import HomePage from './pages/HomePage';
 import PricingPage from './pages/PricingPage';
 import ReschedulePage from './pages/ReschedulePage';
@@ -77,6 +87,24 @@ function App() {
                 </ProtectedRoute>
               }
             />
+          </Route>
+
+          {/* Superadmin protected routes */}
+          <Route
+            element={
+              <AdminRoute>
+                <AdminLayout />
+              </AdminRoute>
+            }
+          >
+            <Route path="/admin" element={<AdminDashboardPage />} />
+            <Route path="/admin/users" element={<AdminUsersPage />} />
+            <Route path="/admin/users/:id" element={<AdminUserDetailPage />} />
+            <Route path="/admin/businesses" element={<AdminBusinessesPage />} />
+            <Route path="/admin/subscriptions" element={<AdminSubscriptionsPage />} />
+            <Route path="/admin/payments" element={<AdminPaymentsPage />} />
+            <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
+            <Route path="/admin/audit-log" element={<AdminAuditLogPage />} />
           </Route>
 
           {/* Auth routes without Layout */}

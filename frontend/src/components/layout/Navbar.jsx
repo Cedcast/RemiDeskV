@@ -10,11 +10,12 @@ import {
   Bars3Icon,
   XMarkIcon,
   CreditCardIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 
 const Navbar = () => {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -23,7 +24,7 @@ const Navbar = () => {
     navigate('/login');
   };
 
-  const navigation = isAuthenticated
+  const navigation = isAuthenticated && !isAdmin()
     ? [
         { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
         { name: 'Appointments', href: '/dashboard/appointments', icon: CalendarIcon },
@@ -69,6 +70,15 @@ const Navbar = () => {
             )}
             {isAuthenticated ? (
               <>
+                {isAdmin() && (
+                  <Link
+                    to="/admin"
+                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700"
+                  >
+                    <ShieldCheckIcon className="h-4 w-4 mr-1" />
+                    Admin Panel
+                  </Link>
+                )}
                 <div className="flex items-center text-sm text-gray-700">
                   <UserCircleIcon className="h-5 w-5 mr-1" />
                   {user?.full_name}
