@@ -33,7 +33,7 @@ We may suspend or terminate accounts that violate these terms.
 
 ## 4. Billing and Payment
 
-- Subscriptions (Premium / Pro) billed monthly; free 7-day trial, no credit card required.
+- Subscriptions (Premium / Pro) billed monthly; free 3-day trial, no credit card required.
 - Currencies: USD, GBP, CAD, AUD.
 - Subscriptions auto-renew; cancel any time effective end of billing period.
 - No refunds for partial periods except where required by law.

@@ -42,10 +42,10 @@ const FEATURES = {
 const FAQ = [
   {
     q: 'Do I need a credit card to start the free trial?',
-    a: 'No! Your 7-day free trial gives you full Pro features with no payment method required. You can upgrade at any time.',
+    a: 'No! Your 3-day free trial gives you full Pro features with no payment method required. You can upgrade at any time.',
   },
   {
-    q: 'What happens after the 7-day trial?',
+    q: 'What happens after the 3-day trial?',
     a: 'After your trial ends, your account will be paused. You can choose either Premium or Pro to continue using RemiDesk.',
   },
   {
@@ -117,7 +117,7 @@ const PricingPage = () => {
       <div className="bg-gradient-to-br from-indigo-600 to-indigo-800 text-white py-20 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <span className="inline-block mb-4 px-4 py-1 rounded-full bg-indigo-500 text-sm font-medium">
-            🎉 7-Day Free Trial — No Credit Card Required
+            🎉 3-Day Free Trial — No Credit Card Required
           </span>
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">Simple, Transparent Pricing</h1>
           <p className="text-indigo-100 text-lg">
@@ -227,7 +227,7 @@ const PricingPage = () => {
         {/* Trial Banner */}
         <div className="mt-8 bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
           <p className="text-green-800 font-semibold text-lg">
-            🚀 Start with a 7-day free trial — full Pro features, no credit card needed.
+            🚀 Start with a 3-day free trial — full Pro features, no credit card needed.
           </p>
           <p className="text-green-600 text-sm mt-1">
             Auto-downgrade after trial. Upgrade anytime before it ends.
