@@ -121,7 +121,7 @@ async def upgrade_subscription(
         try:
             result = await paystack_provider.initialize_transaction(
                 email=current_user.email,
-                amount_minor_units=price_info["amount"],
+                amount_kobo=price_info["amount"],
                 currency=currency,
                 tier=tier,
                 callback_url=callback_url,
