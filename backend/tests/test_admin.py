@@ -117,7 +117,7 @@ def test_payment(db, regular_user, test_subscription):
     payment = Payment(
         user_id=regular_user.id,
         subscription_id=test_subscription.id,
-        provider=PaymentProvider.STRIPE,
+        provider=PaymentProvider.PAYSTACK,
         status=PaymentStatus.COMPLETED,
         amount=1200,
         currency="USD",

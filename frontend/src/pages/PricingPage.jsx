@@ -3,16 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
 
-const CURRENCIES = [
-  { code: 'USD', symbol: '$', flag: '🇺🇸', name: 'US Dollar' },
-  { code: 'GBP', symbol: '£', flag: '🇬🇧', name: 'British Pound' },
-  { code: 'CAD', symbol: 'C$', flag: '🇨🇦', name: 'Canadian Dollar' },
-  { code: 'AUD', symbol: 'A$', flag: '🇦🇺', name: 'Australian Dollar' },
-];
-
 const PRICES = {
-  premium: { USD: '12.00', GBP: '9.99', CAD: '16.00', AUD: '18.00' },
-  pro:     { USD: '39.00', GBP: '31.00', CAD: '52.00', AUD: '59.00' },
+  premium: '$12.00',
+  pro: '$39.00',
 };
 
 const FEATURES = {
@@ -54,11 +47,11 @@ const FAQ = [
   },
   {
     q: 'Which countries are supported?',
-    a: 'RemiDesk supports businesses in the UK, Canada, Australia, and the US. Payments are processed in your local currency.',
+    a: 'RemiDesk supports businesses in the UK, Canada, Australia, and the US. All payments are processed in USD via Paystack.',
   },
   {
     q: 'What payment methods do you accept?',
-    a: 'We accept credit/debit cards (via Stripe), Apple Pay, Google Pay, and PayPal for international users.',
+    a: 'We accept card payments via Paystack.',
   },
   {
     q: 'Can I switch between plans?',
@@ -67,18 +60,15 @@ const FAQ = [
 ];
 
 const PricingPage = () => {
-  const [currency, setCurrency] = useState('USD');
   const [openFaq, setOpenFaq] = useState(null);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-
-  const selectedCurrency = CURRENCIES.find((c) => c.code === currency);
 
   const handleCTA = (tier) => {
     if (isAuthenticated) {
       navigate('/dashboard/billing', { state: { upgradeToTier: tier } });
     } else {
-      navigate('/register', { state: { tier, currency } });
+      navigate('/register', { state: { tier } });
     }
   };
 
@@ -123,22 +113,6 @@ const PricingPage = () => {
           <p className="text-indigo-100 text-lg">
             Choose the plan that grows with your business. Start free, upgrade anytime.
           </p>
-          {/* Currency selector */}
-          <div className="mt-8 inline-flex items-center gap-2 bg-indigo-700 rounded-xl p-1">
-            {CURRENCIES.map((c) => (
-              <button
-                key={c.code}
-                onClick={() => setCurrency(c.code)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  currency === c.code
-                    ? 'bg-white text-indigo-700 shadow'
-                    : 'text-indigo-100 hover:text-white'
-                }`}
-              >
-                {c.flag} {c.code}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
 
@@ -159,7 +133,7 @@ const PricingPage = () => {
               </p>
               <div className="mb-6">
                 <span className="text-4xl font-extrabold text-gray-900">
-                  {selectedCurrency?.symbol}{PRICES.premium[currency]}
+                  ${PRICES.premium}
                 </span>
                 <span className="text-gray-500 ml-1">/month</span>
               </div>
@@ -200,7 +174,7 @@ const PricingPage = () => {
               </p>
               <div className="mb-6">
                 <span className="text-4xl font-extrabold">
-                  {selectedCurrency?.symbol}{PRICES.pro[currency]}
+                  ${PRICES.pro}
                 </span>
                 <span className="text-indigo-200 ml-1">/month</span>
               </div>

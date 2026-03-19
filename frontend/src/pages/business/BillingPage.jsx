@@ -27,13 +27,7 @@ const STATUS_LABELS = {
   expired: { label: 'Expired', color: 'text-red-600', icon: XCircleIcon },
 };
 
-const CURRENCIES = [
-  { code: 'USD', symbol: '$', flag: '🇺🇸' },
-  { code: 'GBP', symbol: '£', flag: '🇬🇧' },
-  { code: 'CAD', symbol: 'C$', flag: '🇨🇦' },
-  { code: 'AUD', symbol: 'A$', flag: '🇦🇺' },
-  { code: 'NGN', symbol: '₦', flag: '🇳🇬' },
-];
+const CURRENCY = { code: 'USD', symbol: '$', flag: '🇺🇸' };
 
 const BillingPage = () => {
   const location = useLocation();
@@ -42,20 +36,11 @@ const BillingPage = () => {
   const [loading, setLoading] = useState(true);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [checkoutTier, setCheckoutTier] = useState('pro');
-  const [currency, setCurrency] = useState('USD');
   const [cancelling, setCancelling] = useState(false);
 
-  // Handle PayPal redirect back
+  // Handle Paystack redirect back
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const paypalStatus = params.get('paypal');
-    const orderId = params.get('token'); // PayPal appends token to return_url
-
-    if (paypalStatus === 'success' && orderId) {
-      capturePayPalOrder(orderId);
-    } else if (paypalStatus === 'cancel') {
-      toast.error('PayPal payment cancelled.');
-    }
 
     // Handle Paystack redirect back
     const paystackStatus = params.get('paystack');
@@ -66,34 +51,13 @@ const BillingPage = () => {
     }
   }, [location.search]);
 
-  const capturePayPalOrder = async (orderId) => {
-    try {
-      const upgradeState = sessionStorage.getItem('paypal_upgrade');
-      if (!upgradeState) return;
-      const { tier, currency: cur } = JSON.parse(upgradeState);
-      await billingAPI.upgrade({
-        tier,
-        currency: cur,
-        provider: 'paypal',
-        paypal_order_id: orderId,
-      });
-      toast.success('PayPal payment successful!');
-      sessionStorage.removeItem('paypal_upgrade');
-      loadSubscription();
-    } catch (err) {
-      toast.error(err.response?.data?.detail || 'PayPal payment failed.');
-    }
-  };
-
   const capturePaystackPayment = async (reference) => {
     try {
       const upgradeState = sessionStorage.getItem('paystack_upgrade');
       if (!upgradeState) return;
-      const { tier, currency: cur } = JSON.parse(upgradeState);
+      const { tier } = JSON.parse(upgradeState);
       await billingAPI.upgrade({
         tier,
-        currency: cur,
-        provider: 'paystack',
         paystack_reference: reference,
       });
       toast.success('Paystack payment successful!');
@@ -131,7 +95,7 @@ const BillingPage = () => {
 
   const handleStartTrial = async () => {
     try {
-      await billingAPI.startTrial({ currency });
+      await billingAPI.startTrial({});
       toast.success('Free trial started! Enjoy 3 days of Pro features.');
       loadSubscription();
     } catch (err) {
@@ -156,8 +120,8 @@ const BillingPage = () => {
   const openUpgrade = (tier) => {
     setCheckoutTier(tier);
     setCheckoutOpen(true);
-    // Store upgrade intent for PayPal redirect
-    sessionStorage.setItem('paypal_upgrade', JSON.stringify({ tier, currency }));
+    // Store upgrade intent for Paystack redirect
+    sessionStorage.setItem('paystack_upgrade', JSON.stringify({ tier }));
   };
 
   const onCheckoutSuccess = (newSub) => {
@@ -238,7 +202,7 @@ const BillingPage = () => {
                 {statusInfo.label}
               </span>
               <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                {subscription.currency}
+                {CURRENCY.flag} {CURRENCY.code}
               </span>
             </div>
 
@@ -293,24 +257,6 @@ const BillingPage = () => {
                 </div>
               </div>
             )}
-
-            {/* Currency selector */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm text-gray-500">Currency:</span>
-              {CURRENCIES.map((c) => (
-                <button
-                  key={c.code}
-                  onClick={() => setCurrency(c.code)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-                    currency === c.code
-                      ? 'bg-indigo-600 text-white border-indigo-600'
-                      : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'
-                  }`}
-                >
-                  {c.flag} {c.code}
-                </button>
-              ))}
-            </div>
 
             {/* Actions */}
             <div className="flex flex-wrap gap-3 pt-2">
@@ -418,7 +364,6 @@ const BillingPage = () => {
         isOpen={checkoutOpen}
         onClose={() => setCheckoutOpen(false)}
         tier={checkoutTier}
-        currency={currency}
         onSuccess={onCheckoutSuccess}
       />
     </div>
