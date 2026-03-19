@@ -19,12 +19,14 @@ PRICING: Dict[str, Dict[str, Dict[str, Any]]] = {
         "GBP": {"amount":  999, "symbol": "£", "label": "£9.99"},
         "CAD": {"amount": 1600, "symbol": "C$", "label": "C$16.00"},
         "AUD": {"amount": 1800, "symbol": "A$", "label": "A$18.00"},
+        "NGN": {"amount": 800000, "symbol": "₦", "label": "₦8,000"},
     },
     "pro": {
         "USD": {"amount": 3900, "symbol": "$", "label": "$39.00"},
         "GBP": {"amount": 3100, "symbol": "£", "label": "£31.00"},
         "CAD": {"amount": 5200, "symbol": "C$", "label": "C$52.00"},
         "AUD": {"amount": 5900, "symbol": "A$", "label": "A$59.00"},
+        "NGN": {"amount": 1500000, "symbol": "₦", "label": "₦15,000"},
     },
 }
 
@@ -34,6 +36,7 @@ CURRENCIES = {
     "GBP": {"symbol": "£", "name": "British Pound", "flag": "🇬🇧"},
     "CAD": {"symbol": "C$", "name": "Canadian Dollar", "flag": "🇨🇦"},
     "AUD": {"symbol": "A$", "name": "Australian Dollar", "flag": "🇦🇺"},
+    "NGN": {"symbol": "₦", "name": "Nigerian Naira", "flag": "🇳🇬"},
 }
 
 # Tier limits / feature flags
@@ -263,6 +266,7 @@ def activate_paid_subscription(
     stripe_customer_id: Optional[str] = None,
     stripe_subscription_id: Optional[str] = None,
     paypal_subscription_id: Optional[str] = None,
+    paystack_reference: Optional[str] = None,
 ) -> Subscription:
     """Activate or upgrade a user's subscription to a paid plan."""
     sub = get_subscription(db, user.id)

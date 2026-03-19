@@ -59,6 +59,7 @@ class PaymentProvider(str, PyEnum):
     """Payment provider enumeration."""
     STRIPE = "stripe"
     PAYPAL = "paypal"
+    PAYSTACK = "paystack"
 
 
 class PaymentStatus(str, PyEnum):

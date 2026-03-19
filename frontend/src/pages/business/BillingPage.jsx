@@ -32,6 +32,7 @@ const CURRENCIES = [
   { code: 'GBP', symbol: '£', flag: '🇬🇧' },
   { code: 'CAD', symbol: 'C$', flag: '🇨🇦' },
   { code: 'AUD', symbol: 'A$', flag: '🇦🇺' },
+  { code: 'NGN', symbol: '₦', flag: '🇳🇬' },
 ];
 
 const BillingPage = () => {
@@ -55,6 +56,14 @@ const BillingPage = () => {
     } else if (paypalStatus === 'cancel') {
       toast.error('PayPal payment cancelled.');
     }
+
+    // Handle Paystack redirect back
+    const paystackStatus = params.get('paystack');
+    const paystackRef = params.get('reference') || params.get('trxref');
+
+    if (paystackStatus === 'success' && paystackRef) {
+      capturePaystackPayment(paystackRef);
+    }
   }, [location.search]);
 
   const capturePayPalOrder = async (orderId) => {
@@ -73,6 +82,25 @@ const BillingPage = () => {
       loadSubscription();
     } catch (err) {
       toast.error(err.response?.data?.detail || 'PayPal payment failed.');
+    }
+  };
+
+  const capturePaystackPayment = async (reference) => {
+    try {
+      const upgradeState = sessionStorage.getItem('paystack_upgrade');
+      if (!upgradeState) return;
+      const { tier, currency: cur } = JSON.parse(upgradeState);
+      await billingAPI.upgrade({
+        tier,
+        currency: cur,
+        provider: 'paystack',
+        paystack_reference: reference,
+      });
+      toast.success('Paystack payment successful!');
+      sessionStorage.removeItem('paystack_upgrade');
+      loadSubscription();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Paystack payment failed.');
     }
   };
 
