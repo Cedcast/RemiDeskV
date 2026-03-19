@@ -65,6 +65,42 @@ class UserLogin(BaseModel):
     password: str
 
 
+# ============ Password Reset & Verification Schemas ============
+
+class ForgotPasswordRequest(BaseModel):
+    """Request body for forgot password."""
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    """Request body for resetting password via token."""
+    token: str
+    new_password: str
+
+    @validator('new_password')
+    def password_min_length(cls, v):
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters long')
+        return v
+
+
+class ResendVerificationRequest(BaseModel):
+    """Request body for resending email verification."""
+    email: EmailStr
+
+
+class ChangePasswordRequest(BaseModel):
+    """Request body for changing password (authenticated)."""
+    current_password: str
+    new_password: str
+
+    @validator('new_password')
+    def password_min_length(cls, v):
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters long')
+        return v
+
+
 # ============ Business Schemas ============
 
 class BusinessBase(BaseModel):
@@ -75,11 +111,11 @@ class BusinessBase(BaseModel):
     city: Optional[str] = None
     state: Optional[str] = None
     zip_code: Optional[str] = None
-    country: str = "USA"
+    country: str = ""
     phone: Optional[str] = None
     email: Optional[EmailStr] = None
     website: Optional[str] = None
-    timezone: str = "America/New_York"
+    timezone: str = "UTC"
 
 
 class BusinessCreate(BusinessBase):

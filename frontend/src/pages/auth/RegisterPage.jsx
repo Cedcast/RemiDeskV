@@ -16,7 +16,7 @@ const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const { register, login } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -60,9 +60,8 @@ const RegisterPage = () => {
         role: 'business_owner',
       });
 
-      toast.success('Account created successfully!');
-      await login(formData.email, formData.password);
-      navigate('/dashboard');
+      toast.success('Account created! Please check your email to verify your account.');
+      navigate('/check-email');
     } catch (error) {
       const message = error.response?.data?.detail || 'Registration failed';
       toast.error(message);
