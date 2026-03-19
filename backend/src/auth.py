@@ -118,3 +118,39 @@ def authenticate_user(db: Session, email: str, password: str) -> Optional[User]:
     if not verify_password(password, user.hashed_password):
         return None
     return user
+
+
+def create_verification_token(user_id: int) -> str:
+    """Create a signed JWT used for email verification (expires in 24h)."""
+    data = {"sub": str(user_id), "type": "email_verification"}
+    return create_access_token(data, expires_delta=timedelta(hours=24))
+
+
+def verify_verification_token(token: str) -> Optional[int]:
+    """Verify an email verification token. Returns user_id or None."""
+    try:
+        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+        if payload.get("type") != "email_verification":
+            return None
+        user_id = payload.get("sub")
+        return int(user_id) if user_id else None
+    except JWTError:
+        return None
+
+
+def create_password_reset_token(user_id: int) -> str:
+    """Create a signed JWT used for password reset (expires in 1h)."""
+    data = {"sub": str(user_id), "type": "password_reset"}
+    return create_access_token(data, expires_delta=timedelta(hours=1))
+
+
+def verify_password_reset_token(token: str) -> Optional[int]:
+    """Verify a password reset token. Returns user_id or None."""
+    try:
+        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+        if payload.get("type") != "password_reset":
+            return None
+        user_id = payload.get("sub")
+        return int(user_id) if user_id else None
+    except JWTError:
+        return None

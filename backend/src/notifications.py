@@ -147,6 +147,58 @@ class EmailService:
         )
         return await self.send_email(to_email, subject, content)
 
+    async def send_verification_email(self, to_email: str, full_name: str, verification_url: str) -> bool:
+        """Send email verification link to a newly registered user."""
+        subject = "Verify your RemDesk email address"
+        content = (
+            f"Hello {full_name},\n\n"
+            f"Thank you for registering with RemDesk!\n\n"
+            f"Please verify your email address by clicking the link below:\n"
+            f"{verification_url}\n\n"
+            f"This link expires in 24 hours.\n\n"
+            f"If you did not create an account, please ignore this email.\n\n"
+            f"The RemDesk Team"
+        )
+        html_content = (
+            f"<html><body>"
+            f"<h2>Welcome to RemDesk!</h2>"
+            f"<p>Hello {full_name},</p>"
+            f"<p>Thank you for registering. Please verify your email address to activate your account.</p>"
+            f'<p><a href="{verification_url}" style="background:#4F46E5;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;display:inline-block;">Verify Email Address</a></p>'
+            f"<p>Or copy and paste this link into your browser:</p>"
+            f"<p>{verification_url}</p>"
+            f"<p><small>This link expires in 24 hours. If you did not create an account, please ignore this email.</small></p>"
+            f"<p>The RemDesk Team</p>"
+            f"</body></html>"
+        )
+        return await self.send_email(to_email, subject, content, html_content)
+
+    async def send_password_reset_email(self, to_email: str, full_name: str, reset_url: str) -> bool:
+        """Send a password reset link to the user."""
+        subject = "Reset your RemDesk password"
+        content = (
+            f"Hello {full_name},\n\n"
+            f"We received a request to reset your RemDesk password.\n\n"
+            f"Click the link below to reset your password:\n"
+            f"{reset_url}\n\n"
+            f"This link expires in 1 hour.\n\n"
+            f"If you did not request a password reset, please ignore this email.\n\n"
+            f"The RemDesk Team"
+        )
+        html_content = (
+            f"<html><body>"
+            f"<h2>Reset your password</h2>"
+            f"<p>Hello {full_name},</p>"
+            f"<p>We received a request to reset your RemDesk password.</p>"
+            f'<p><a href="{reset_url}" style="background:#4F46E5;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;display:inline-block;">Reset Password</a></p>'
+            f"<p>Or copy and paste this link into your browser:</p>"
+            f"<p>{reset_url}</p>"
+            f"<p><small>This link expires in 1 hour. If you did not request this, please ignore this email.</small></p>"
+            f"<p>The RemDesk Team</p>"
+            f"</body></html>"
+        )
+        return await self.send_email(to_email, subject, content, html_content)
+
 
 class SMSService:
     """SMS notification service using Twilio."""

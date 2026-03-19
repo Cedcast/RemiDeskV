@@ -10,6 +10,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [unverified, setUnverified] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const LoginPage = () => {
     if (!validate()) return;
 
     setLoading(true);
+    setUnverified(false);
     try {
       const userData = await login(email, password);
       toast.success('Welcome back!');
@@ -36,9 +38,15 @@ const LoginPage = () => {
         navigate('/dashboard');
       }
     } catch (error) {
+      const status = error.response?.status;
       const message = error.response?.data?.detail || 'Invalid email or password';
-      toast.error(message);
-      setErrors({ general: message });
+
+      if (status === 403 && message.toLowerCase().includes('verify your email')) {
+        setUnverified(true);
+      } else {
+        toast.error(message);
+        setErrors({ general: message });
+      }
     } finally {
       setLoading(false);
     }
@@ -69,6 +77,18 @@ const LoginPage = () => {
                 </div>
               )}
 
+              {unverified && (
+                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
+                  Please verify your email before logging in.{' '}
+                  <Link
+                    to="/check-email"
+                    className="font-medium underline hover:text-yellow-900"
+                  >
+                    Resend verification email
+                  </Link>
+                </div>
+              )}
+
               <Input
                 label="Email address"
                 type="email"
@@ -79,15 +99,25 @@ const LoginPage = () => {
                 autoComplete="email"
               />
 
-              <Input
-                label="Password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                error={errors.password}
-                placeholder="••••••••"
-                autoComplete="current-password"
-              />
+              <div>
+                <Input
+                  label="Password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  error={errors.password}
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                />
+                <div className="mt-1 text-right">
+                  <Link
+                    to="/forgot-password"
+                    className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+              </div>
 
               <Button type="submit" loading={loading} className="w-full" size="lg">
                 Sign in

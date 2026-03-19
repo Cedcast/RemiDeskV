@@ -6,7 +6,14 @@ import { Layout, AdminLayout } from './components/layout';
 import { ProtectedRoute, AdminRoute } from './components/auth';
 
 // Pages
-import { LoginPage, RegisterPage } from './pages/auth';
+import {
+  LoginPage,
+  RegisterPage,
+  VerifyEmailPage,
+  CheckEmailPage,
+  ForgotPasswordPage,
+  ResetPasswordPage,
+} from './pages/auth';
 import {
   DashboardPage,
   AppointmentsManagePage,
@@ -110,6 +117,10 @@ function App() {
           {/* Auth routes without Layout */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/check-email" element={<CheckEmailPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
 
           {/* Catch-all: redirect to home */}
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -28,21 +28,10 @@ class Settings(BaseSettings):
     sendgrid_api_key: Optional[str] = None
     from_email: str = "noreply@example.com"
 
-    # Stripe (Payments)
-    stripe_secret_key: Optional[str] = None
-    stripe_publishable_key: Optional[str] = None
-    stripe_webhook_secret: Optional[str] = None
-    stripe_premium_price_id: Optional[str] = None  # Stripe Price ID for Premium plan
-    stripe_pro_price_id: Optional[str] = None  # Stripe Price ID for Pro plan
-
-    # PayPal (International Payments)
-    paypal_client_id: Optional[str] = None
-    paypal_client_secret: Optional[str] = None
-    paypal_mode: str = "sandbox"  # sandbox | live
-
-    # Paystack (African Payments — NGN, GHS, ZAR, KES)
+    # Paystack (Payments)
     paystack_secret_key: Optional[str] = None
     paystack_public_key: Optional[str] = None
+    paystack_webhook_secret: Optional[str] = None
 
     # OpenAI (AI-powered notification messages)
     openai_api_key: Optional[str] = None
