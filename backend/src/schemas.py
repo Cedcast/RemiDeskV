@@ -108,6 +108,9 @@ class BusinessResponse(BusinessBase):
     id: int
     owner_id: int
     is_active: bool
+    business_type: Optional[str] = None
+    business_type_confidence: Optional[float] = None
+    business_type_override: bool = False
     created_at: datetime
     updated_at: datetime
 
@@ -658,3 +661,103 @@ class SuspendRequest(BaseModel):
 class BanUserRequest(BaseModel):
     """Request body for ban user action."""
     reason: Optional[str] = None
+
+
+# ============ AI Notification Schemas ============
+
+class GenerateMessageRequest(BaseModel):
+    """Request body for AI message generation."""
+    notification_type: str  # reminder, confirmation, followup
+    client_name: str
+    business_name: str
+    service_name: str
+    appointment_time: Optional[str] = None
+    hours_before: Optional[int] = None
+    reschedule_url: Optional[str] = None
+    tone: Optional[str] = "professional"  # professional, friendly, casual, motivational
+    language: Optional[str] = "en"  # en, es, fr, de
+    variant_count: Optional[int] = 1
+    business_type: Optional[str] = None
+
+
+class GenerateMessageResponse(BaseModel):
+    """Response for AI message generation."""
+    messages: List[str]
+    notification_type: str
+    tone: str
+    language: str
+    ai_generated: bool
+    quota_remaining: Optional[int] = None
+
+
+class AIQuotaResponse(BaseModel):
+    """Current user AI quota status."""
+    month: str
+    api_calls_used: int
+    api_calls_limit: int
+    cost_usd_used: float
+    cost_usd_limit: float
+    calls_remaining: int
+
+    class Config:
+        orm_mode = True
+
+
+# ============ Business Type Schemas ============
+
+class BusinessTypeResponse(BaseModel):
+    """Business type detection result."""
+    business_type: str
+    confidence: float
+    all_scores: Dict[str, float]
+    is_override: bool = False
+
+
+class BusinessTypeOverrideRequest(BaseModel):
+    """Request body to override business type."""
+    business_type: str
+
+
+# ============ Analytics Schemas ============
+
+class NotificationPerformance(BaseModel):
+    """Notification performance metrics."""
+    total_sent: int
+    by_channel: Dict[str, int]
+    by_type: Dict[str, int]
+    delivery_rate: float
+    sent_last_30_days: int
+
+
+class AppointmentMetrics(BaseModel):
+    """Appointment analytics metrics."""
+    total_appointments: int
+    confirmation_rate: float
+    cancellation_rate: float
+    no_show_rate: float
+    reschedule_rate: float
+    peak_hour: Optional[int] = None
+    peak_day: Optional[str] = None
+    top_services: List[Dict[str, Any]]
+    status_breakdown: Dict[str, int]
+    monthly_trend: List[Dict[str, Any]]
+
+
+class FinancialMetrics(BaseModel):
+    """Financial analytics metrics."""
+    total_revenue: float
+    avg_transaction_value: float
+    revenue_by_service: List[Dict[str, Any]]
+    revenue_by_month: List[Dict[str, Any]]
+    total_clients: int
+    repeat_client_rate: float
+
+
+class AnalyticsOverview(BaseModel):
+    """Key metrics summary for analytics dashboard."""
+    appointment_metrics: AppointmentMetrics
+    notification_performance: Optional[NotificationPerformance] = None
+    financial_metrics: Optional[FinancialMetrics] = None
+    period_start: str
+    period_end: str
+    is_pro: bool
