@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     paypal_client_secret: Optional[str] = None
     paypal_mode: str = "sandbox"  # sandbox | live
 
+    # Paystack (African Payments — NGN, GHS, ZAR, KES)
+    paystack_secret_key: Optional[str] = None
+    paystack_public_key: Optional[str] = None
+
     # OpenAI (AI-powered notification messages)
     openai_api_key: Optional[str] = None
 

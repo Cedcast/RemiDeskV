@@ -11,8 +11,8 @@ import { billingAPI } from '../../services/api';
 import toast from 'react-hot-toast';
 
 const PRICES = {
-  premium: { USD: '$12.00', GBP: '£9.99', CAD: 'C$16.00', AUD: 'A$18.00' },
-  pro:     { USD: '$39.00', GBP: '£31.00', CAD: 'C$52.00', AUD: 'A$59.00' },
+  premium: { USD: '$12.00', GBP: '£9.99', CAD: 'C$16.00', AUD: 'A$18.00', NGN: '₦8,000' },
+  pro:     { USD: '$39.00', GBP: '£31.00', CAD: 'C$52.00', AUD: 'A$59.00', NGN: '₦15,000' },
 };
 
 // Stripe form inner component (must be inside Elements provider)
@@ -159,6 +159,54 @@ const PayPalCheckout = ({ tier, currency, onSuccess, onClose }) => {
   );
 };
 
+// Paystack checkout
+const PaystackCheckout = ({ tier, currency, onSuccess }) => {
+  const [loading, setLoading] = useState(false);
+  const priceDisplay = PRICES[tier]?.[currency] || '';
+
+  const handlePaystack = async () => {
+    setLoading(true);
+    try {
+      const res = await billingAPI.upgrade({
+        tier,
+        currency,
+        provider: 'paystack',
+        return_url: `${window.location.origin}/dashboard/billing?paystack=success`,
+      });
+      if (res.data.authorization_url) {
+        // Store upgrade intent for redirect-back handling
+        sessionStorage.setItem('paystack_upgrade', JSON.stringify({ tier, currency }));
+        window.location.href = res.data.authorization_url;
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Paystack error. Please try again.');
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+        <p className="text-sm text-gray-500 mb-1">You will be charged</p>
+        <p className="text-2xl font-bold text-gray-900">
+          {priceDisplay}
+          <span className="text-sm font-normal text-gray-500">/month</span>
+        </p>
+      </div>
+      <button
+        onClick={handlePaystack}
+        disabled={loading}
+        className="w-full py-3 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 transition-colors disabled:opacity-50 text-lg"
+      >
+        {loading ? 'Redirecting to Paystack...' : 'Pay with Paystack'}
+      </button>
+      <p className="text-xs text-center text-gray-400">
+        You will be redirected to Paystack to complete payment. Supports cards, bank transfers &amp; USSD.
+      </p>
+    </div>
+  );
+};
+
 // Main checkout modal
 const CheckoutModal = ({ isOpen, onClose, tier, currency = 'USD', onSuccess }) => {
   const [tab, setTab] = useState('stripe');
@@ -205,6 +253,16 @@ const CheckoutModal = ({ isOpen, onClose, tier, currency = 'USD', onSuccess }) =
           >
             🅿️ PayPal
           </button>
+          <button
+            onClick={() => setTab('paystack')}
+            className={`flex-1 py-3 text-sm font-medium transition-colors ${
+              tab === 'paystack'
+                ? 'border-b-2 border-indigo-600 text-indigo-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            🏦 Paystack
+          </button>
         </div>
 
         {/* Content */}
@@ -232,6 +290,13 @@ const CheckoutModal = ({ isOpen, onClose, tier, currency = 'USD', onSuccess }) =
               currency={currency}
               onSuccess={onSuccess}
               onClose={onClose}
+            />
+          )}
+          {tab === 'paystack' && (
+            <PaystackCheckout
+              tier={tier}
+              currency={currency}
+              onSuccess={onSuccess}
             />
           )}
         </div>
