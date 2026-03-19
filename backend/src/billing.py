@@ -16,28 +16,14 @@ from .config import settings
 PRICING: Dict[str, Dict[str, Dict[str, Any]]] = {
     "premium": {
         "USD": {"amount": 1200, "symbol": "$", "label": "$12.00"},
-        "GBP": {"amount":  999, "symbol": "£", "label": "£9.99"},
-        "CAD": {"amount": 1600, "symbol": "C$", "label": "C$16.00"},
-        "AUD": {"amount": 1800, "symbol": "A$", "label": "A$18.00"},
-        "NGN": {"amount": 800000, "symbol": "₦", "label": "₦8,000"},
     },
     "pro": {
         "USD": {"amount": 3900, "symbol": "$", "label": "$39.00"},
-        "GBP": {"amount": 3100, "symbol": "£", "label": "£31.00"},
-        "CAD": {"amount": 5200, "symbol": "C$", "label": "C$52.00"},
-        "AUD": {"amount": 5900, "symbol": "A$", "label": "A$59.00"},
-        "NGN": {"amount": 1500000, "symbol": "₦", "label": "₦15,000"},
     },
 }
 
 # Supported currencies and their display info
-CURRENCIES = {
-    "USD": {"symbol": "$", "name": "US Dollar", "flag": "🇺🇸"},
-    "GBP": {"symbol": "£", "name": "British Pound", "flag": "🇬🇧"},
-    "CAD": {"symbol": "C$", "name": "Canadian Dollar", "flag": "🇨🇦"},
-    "AUD": {"symbol": "A$", "name": "Australian Dollar", "flag": "🇦🇺"},
-    "NGN": {"symbol": "₦", "name": "Nigerian Naira", "flag": "🇳🇬"},
-}
+CURRENCIES = {"USD": {"symbol": "$", "name": "US Dollar", "flag": "🇺🇸"}}
 
 # Tier limits / feature flags
 TIER_LIMITS = {
@@ -133,9 +119,7 @@ def get_pricing_info(currency: str = "USD") -> Dict[str, Any]:
 
 def create_trial_subscription(db: Session, user: User, currency: str = "USD") -> Subscription:
     """Create a new free trial subscription for a user."""
-    currency = currency.upper()
-    if currency not in CURRENCIES:
-        currency = settings.app_currency_default
+    currency = "USD"
 
     now = datetime.utcnow()
     trial_end = now + timedelta(days=settings.free_trial_days)
@@ -218,8 +202,7 @@ def get_subscription_info(db: Session, user: User) -> Dict[str, Any]:
         "current_period_start": sub.current_period_start.isoformat() if sub.current_period_start else None,
         "current_period_end": sub.current_period_end.isoformat() if sub.current_period_end else None,
         "cancelled_at": sub.cancelled_at.isoformat() if sub.cancelled_at else None,
-        "stripe_customer_id": sub.stripe_customer_id,
-        "stripe_subscription_id": sub.stripe_subscription_id,
+        "paystack_reference": sub.paystack_reference,
         "limits": limits,
     }
 
@@ -263,9 +246,6 @@ def activate_paid_subscription(
     currency: str,
     period_start: datetime,
     period_end: datetime,
-    stripe_customer_id: Optional[str] = None,
-    stripe_subscription_id: Optional[str] = None,
-    paypal_subscription_id: Optional[str] = None,
     paystack_reference: Optional[str] = None,
 ) -> Subscription:
     """Activate or upgrade a user's subscription to a paid plan."""
@@ -279,12 +259,8 @@ def activate_paid_subscription(
     sub.currency = currency
     sub.current_period_start = period_start
     sub.current_period_end = period_end
-    if stripe_customer_id:
-        sub.stripe_customer_id = stripe_customer_id
-    if stripe_subscription_id:
-        sub.stripe_subscription_id = stripe_subscription_id
-    if paypal_subscription_id:
-        sub.paypal_subscription_id = paypal_subscription_id
+    if paystack_reference:
+        sub.paystack_reference = paystack_reference
     sub.updated_at = datetime.utcnow()
 
     db.commit()

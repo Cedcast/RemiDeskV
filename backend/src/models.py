@@ -57,8 +57,6 @@ class SubscriptionStatus(str, PyEnum):
 
 class PaymentProvider(str, PyEnum):
     """Payment provider enumeration."""
-    STRIPE = "stripe"
-    PAYPAL = "paypal"
     PAYSTACK = "paystack"
 
 
@@ -216,7 +214,7 @@ class NotificationLog(Base):
     id = Column(Integer, primary_key=True, index=True)
     appointment_id = Column(Integer, ForeignKey("appointments.id"), nullable=False)
     channel = Column(String(20), nullable=False)  # email, sms, whatsapp
-    notification_type = Column(String(50), nullable=False)  # confirmation, reminder_24h, reminder_1h, followup
+    notification_type = Column(String(50), nullable=False)  # confirmation, reminder_24h, reminder_2h, followup
     recipient = Column(String(255), nullable=True)  # email address or phone number
     subject = Column(String(255), nullable=True)
     message = Column(Text, nullable=False)
@@ -237,7 +235,7 @@ class Subscription(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True)
     tier = Column(Enum(SubscriptionTier), default=SubscriptionTier.FREE_TRIAL, nullable=False)
     status = Column(Enum(SubscriptionStatus), default=SubscriptionStatus.TRIALING, nullable=False)
-    currency = Column(String(3), default="USD", nullable=False)  # USD, GBP, CAD, AUD
+    currency = Column(String(3), default="USD", nullable=False)  # USD only
 
     # Trial tracking
     trial_started_at = Column(DateTime, nullable=True)
@@ -249,9 +247,9 @@ class Subscription(Base):
     cancelled_at = Column(DateTime, nullable=True)
 
     # Provider references
-    stripe_customer_id = Column(String(255), nullable=True)
-    stripe_subscription_id = Column(String(255), nullable=True)
-    paypal_subscription_id = Column(String(255), nullable=True)
+    # NOTE: stripe_customer_id, stripe_subscription_id, paypal_subscription_id removed.
+    # A DB migration (Alembic) is required to drop those columns in production.
+    paystack_reference = Column(String(255), nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

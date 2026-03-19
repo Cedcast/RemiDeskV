@@ -34,7 +34,7 @@ We may suspend or terminate accounts that violate these terms.
 ## 4. Billing and Payment
 
 - Subscriptions (Premium / Pro) billed monthly; free 3-day trial, no credit card required.
-- Currencies: USD, GBP, CAD, AUD.
+- All prices are in USD. Payment is processed securely via Paystack.
 - Subscriptions auto-renew; cancel any time effective end of billing period.
 - No refunds for partial periods except where required by law.
 - 30 days' notice for pricing changes.

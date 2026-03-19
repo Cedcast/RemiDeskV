@@ -79,8 +79,8 @@ async def _send_notifications(appointment: Appointment, notification_type: str, 
                 client.email, client.name, business.name, service_name,
                 appointment_time, reschedule_url,
             )
-        elif notification_type in ("reminder_24h", "reminder_1h"):
-            hours = 24 if notification_type == "reminder_24h" else 1
+        elif notification_type in ("reminder_24h", "reminder_2h"):
+            hours = 24 if notification_type == "reminder_24h" else 2
             ok = await email_service.send_appointment_reminder(
                 client.email, client.name, business.name, service_name,
                 appointment_time, hours, reschedule_url,
@@ -97,8 +97,8 @@ async def _send_notifications(appointment: Appointment, notification_type: str, 
             ok = await sms_service.send_appointment_confirmation(
                 client.phone, business.name, service_name, appointment_time, reschedule_url,
             )
-        elif notification_type in ("reminder_24h", "reminder_1h"):
-            hours = 24 if notification_type == "reminder_24h" else 1
+        elif notification_type in ("reminder_24h", "reminder_2h"):
+            hours = 24 if notification_type == "reminder_24h" else 2
             ok = await sms_service.send_appointment_reminder(
                 client.phone, business.name, service_name, appointment_time, hours, reschedule_url,
             )
@@ -113,8 +113,8 @@ async def _send_notifications(appointment: Appointment, notification_type: str, 
                 client.phone, client.name, business.name, service_name,
                 appointment_time, reschedule_url,
             )
-        elif notification_type in ("reminder_24h", "reminder_1h"):
-            hours = 24 if notification_type == "reminder_24h" else 1
+        elif notification_type in ("reminder_24h", "reminder_2h"):
+            hours = 24 if notification_type == "reminder_24h" else 2
             ok = await whatsapp_service.send_appointment_reminder(
                 client.phone, client.name, business.name, service_name,
                 appointment_time, hours, reschedule_url,
