@@ -111,6 +111,10 @@ class Business(Base):
     is_active = Column(Boolean, default=True)
     suspended_at = Column(DateTime, nullable=True)
     suspension_reason = Column(Text, nullable=True)
+    # Business type detection
+    business_type = Column(String(100), nullable=True)
+    business_type_confidence = Column(Float, nullable=True)
+    business_type_override = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -251,6 +255,13 @@ class Subscription(Base):
     # A DB migration (Alembic) is required to drop those columns in production.
     paystack_reference = Column(String(255), nullable=True)
 
+    # Feature flags
+    ai_notifications_enabled = Column(Boolean, default=False)
+    advanced_analytics_enabled = Column(Boolean, default=False)
+    business_type_detection_enabled = Column(Boolean, default=False)
+    api_access_enabled = Column(Boolean, default=False)
+    data_retention_days = Column(Integer, default=90)
+
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -303,3 +314,80 @@ class AuditLog(Base):
 
     # Relationships
     admin = relationship("User", foreign_keys=[admin_id])
+
+
+class AIUsageLog(Base):
+    """Tracks every OpenAI API call for cost management and auditing."""
+    __tablename__ = "ai_usage_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    business_id = Column(Integer, ForeignKey("businesses.id"), nullable=True)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    model = Column(String(50), nullable=False)
+    prompt_tokens = Column(Integer, default=0)
+    completion_tokens = Column(Integer, default=0)
+    cost_usd = Column(Float, default=0.0)
+    notification_type = Column(String(50), nullable=True)
+    success = Column(Boolean, default=True)
+
+    # Relationships
+    user = relationship("User", foreign_keys=[user_id])
+    business = relationship("Business", foreign_keys=[business_id])
+
+
+class NotificationAnalytics(Base):
+    """Tracks notification delivery and engagement events."""
+    __tablename__ = "notification_analytics"
+
+    id = Column(Integer, primary_key=True, index=True)
+    notification_id = Column(Integer, ForeignKey("notification_logs.id"), nullable=True)
+    appointment_id = Column(Integer, ForeignKey("appointments.id"), nullable=True)
+    business_id = Column(Integer, ForeignKey("businesses.id"), nullable=False)
+    channel = Column(String(20), nullable=False)  # sms, email, whatsapp
+    sent_at = Column(DateTime, nullable=True)
+    delivered_at = Column(DateTime, nullable=True)
+    opened_at = Column(DateTime, nullable=True)
+    clicked_at = Column(DateTime, nullable=True)
+    event_type = Column(String(50), nullable=True)  # delivery, open, click
+
+    # Relationships
+    business = relationship("Business", foreign_keys=[business_id])
+    appointment = relationship("Appointment", foreign_keys=[appointment_id])
+
+
+class BusinessInsight(Base):
+    """Aggregated business performance metrics per period."""
+    __tablename__ = "business_insights"
+
+    id = Column(Integer, primary_key=True, index=True)
+    business_id = Column(Integer, ForeignKey("businesses.id"), nullable=False)
+    period_start = Column(DateTime, nullable=False)
+    period_end = Column(DateTime, nullable=False)
+    total_appointments = Column(Integer, default=0)
+    total_revenue = Column(Float, default=0.0)
+    avg_transaction = Column(Float, default=0.0)
+    client_retention_rate = Column(Float, default=0.0)
+    top_service_id = Column(Integer, ForeignKey("services.id"), nullable=True)
+    computed_at = Column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    business = relationship("Business", foreign_keys=[business_id])
+    top_service = relationship("Service", foreign_keys=[top_service_id])
+
+
+class AIQuota(Base):
+    """Tracks per-user monthly AI API usage quota."""
+    __tablename__ = "ai_quotas"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    month = Column(String(7), nullable=False)  # YYYY-MM
+    api_calls_used = Column(Integer, default=0)
+    api_calls_limit = Column(Integer, default=500)
+    cost_usd_used = Column(Float, default=0.0)
+    cost_usd_limit = Column(Float, default=50.0)
+    reset_at = Column(DateTime, nullable=True)
+
+    # Relationships
+    user = relationship("User", foreign_keys=[user_id])
