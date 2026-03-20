@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { analyticsAPI, appointmentAPI } from '../../services/api';
+import { analyticsAPI, appointmentAPI, billingAPI } from '../../services/api';
 import {
   CalendarIcon,
   CheckCircleIcon,
@@ -9,6 +9,7 @@ import {
   UserGroupIcon,
   ArrowPathIcon,
   PlusIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/outline';
 import {
   BarChart,
@@ -64,6 +65,7 @@ const StatCard = ({ title, value, icon: Icon, color = 'indigo', subtitle }) => {
 const DashboardPage = () => {
   const [stats, setStats] = useState(null);
   const [upcoming, setUpcoming] = useState([]);
+  const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -73,12 +75,14 @@ const DashboardPage = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [statsRes, upcomingRes] = await Promise.all([
+      const [statsRes, upcomingRes, subRes] = await Promise.all([
         analyticsAPI.getStats(),
         appointmentAPI.getUpcoming(5),
+        billingAPI.getCurrent().catch(() => ({ data: null })),
       ]);
       setStats(statsRes.data);
       setUpcoming(upcomingRes.data);
+      setSubscription(subRes.data);
     } catch (err) {
       console.error('Failed to load dashboard data', err);
     } finally {
@@ -116,6 +120,86 @@ const DashboardPage = () => {
           New Appointment
         </Link>
       </div>
+
+      {/* Plan & AI reminders strip + reschedule insight */}
+      {stats && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+          <div className="lg:col-span-2 bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex items-start gap-3">
+            <div className="mt-1 flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100">
+              <SparklesIcon className="h-5 w-5 text-indigo-600" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-indigo-700 mb-1">
+                Plan & AI reminders
+              </p>
+              {subscription ? (
+                <>
+                  <p className="text-sm text-gray-900 font-medium">
+                    {['pro', 'free_trial'].includes(subscription.tier) ? (
+                      <>AI reminders are <span className="text-green-600">enabled</span> on your {subscription.tier === 'pro' ? 'Pro plan' : 'free trial'}.</>
+                    ) : (
+                      <>AI reminders are <span className="text-amber-600">locked</span> on your current plan.</>
+                    )}
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Let RemiDesk write and send smart SMS, email, and WhatsApp reminders so you reduce no-shows without extra work.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => (window.location.href = '/dashboard/billing')}
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-indigo-700 hover:text-indigo-800"
+                  >
+                    Manage plan in Billing →
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-gray-900 font-medium">
+                    Start your free trial to unlock AI-powered reminders and Pro analytics.
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Your first 7 days include full Pro features so you can see how much time AI can save you.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => (window.location.href = '/dashboard/billing')}
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-indigo-700 hover:text-indigo-800"
+                  >
+                    Go to Billing to start trial →
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="bg-white border border-gray-100 rounded-xl p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+              Reschedules & no-shows
+            </p>
+            <p className="text-sm text-gray-900 font-medium mb-1">
+              This month across all businesses
+            </p>
+            <div className="flex items-center gap-4 mt-2">
+              <div>
+                <p className="text-2xl font-bold text-indigo-600">
+                  {stats.status_breakdown.rescheduled ?? 0}
+                </p>
+                <p className="text-xs text-gray-500">Rescheduled</p>
+              </div>
+              <div className="h-10 w-px bg-gray-200" />
+              <div>
+                <p className="text-2xl font-bold text-slate-600">
+                  {stats.status_breakdown.no_show ?? 0}
+                </p>
+                <p className="text-xs text-gray-500">No-shows</p>
+              </div>
+            </div>
+            <p className="text-[11px] text-gray-400 mt-2">
+              Use smarter reminders and confirmation messages to keep these numbers low.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Stat Cards */}
       {stats && (

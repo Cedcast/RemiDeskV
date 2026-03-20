@@ -11,6 +11,8 @@ import {
   XMarkIcon,
   CreditCardIcon,
   ShieldCheckIcon,
+  WrenchIcon,
+  Cog6ToothIcon,
 } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 
@@ -27,10 +29,12 @@ const Navbar = () => {
   const navigation = isAuthenticated && !isAdmin()
     ? [
         { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-        { name: 'Appointments', href: '/dashboard/appointments', icon: CalendarIcon },
+        { name: 'Calendar', href: '/dashboard/appointments', icon: CalendarIcon },
         { name: 'Clients', href: '/dashboard/clients', icon: UserGroupIcon },
+        { name: 'Services', href: '/dashboard/business#services', icon: WrenchIcon },
         { name: 'My Business', href: '/dashboard/business', icon: BuildingOfficeIcon },
-        { name: 'Billing', href: '/dashboard/billing', icon: CreditCardIcon },
+        { name: 'Billing & Plan', href: '/dashboard/billing', icon: CreditCardIcon },
+        { name: 'Settings', href: '/dashboard/settings', icon: Cog6ToothIcon },
       ]
     : [];
 

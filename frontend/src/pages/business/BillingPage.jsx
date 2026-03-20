@@ -258,6 +258,33 @@ const BillingPage = () => {
               </div>
             )}
 
+            {/* AI reminders teaser */}
+            <div className="mt-4 rounded-lg bg-indigo-50 border border-indigo-100 px-3 py-3 flex items-start gap-3">
+              <div className="mt-0.5 h-7 w-7 rounded-full bg-white flex items-center justify-center border border-indigo-100">
+                <span className="text-xs font-semibold text-indigo-600">AI</span>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900">
+                  AI-powered reminders
+                </p>
+                <p className="text-xs text-gray-600 mt-0.5">
+                  Reduce no-shows with smart SMS, email, and WhatsApp reminders that adapt to your clients.
+                </p>
+                {subscription.tier === 'pro' || subscription.tier === 'free_trial' ? (
+                  <p className="text-xs text-green-700 mt-1 font-medium">
+                    Included on your current plan.
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => openUpgrade('pro')}
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-indigo-700 hover:text-indigo-800"
+                  >
+                    Upgrade to Pro to unlock →
+                  </button>
+                )}
+              </div>
+            </div>
             {/* Actions */}
             <div className="flex flex-wrap gap-3 pt-2">
               {subscription.tier === 'trial_expired' && (

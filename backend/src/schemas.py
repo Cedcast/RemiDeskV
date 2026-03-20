@@ -136,6 +136,8 @@ class BusinessUpdate(BaseModel):
     email: Optional[EmailStr] = None
     website: Optional[str] = None
     timezone: Optional[str] = None
+    business_type: Optional[str] = None
+    business_type_override: Optional[bool] = None
     is_active: Optional[bool] = None
 
 
@@ -345,6 +347,9 @@ class AppointmentResponse(BaseModel):
     notification_channels: Optional[str]
     reschedule_token: Optional[str]
     created_at: datetime
+    # Optional notification summary and AI usage flag, populated by the router
+    ai_messages_enabled: bool = False
+    notification_summary: Optional["AppointmentNotificationSummary"] = None
 
     class Config:
         orm_mode = True
@@ -366,6 +371,21 @@ class AppointmentListResponse(BaseModel):
     total: int
     page: int
     size: int
+
+
+class NotificationStepSummary(BaseModel):
+    """Summary of a specific notification step for an appointment."""
+    sent: bool = False
+    sent_at: Optional[datetime] = None
+    channels: List[str] = []
+
+
+class AppointmentNotificationSummary(BaseModel):
+    """High-level summary of notifications sent for an appointment."""
+    confirmation: NotificationStepSummary = NotificationStepSummary()
+    reminder_24h: NotificationStepSummary = NotificationStepSummary()
+    reminder_2h: NotificationStepSummary = NotificationStepSummary()
+    followup: NotificationStepSummary = NotificationStepSummary()
 
 
 # ============ Time Slot Schemas ============
@@ -797,3 +817,7 @@ class AnalyticsOverview(BaseModel):
     period_start: str
     period_end: str
     is_pro: bool
+
+
+# Resolve forward references for models that use string annotations
+AppointmentResponse.update_forward_refs(AppointmentNotificationSummary=AppointmentNotificationSummary)

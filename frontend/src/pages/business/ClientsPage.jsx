@@ -26,6 +26,15 @@ const ClientsPage = () => {
 
   const PAGE_SIZE = 20;
 
+  const getDialCodeForCountry = (country) => {
+    if (!country) return '';
+    const upper = country.toUpperCase();
+    if (upper === 'UK' || upper === 'GB' || country === 'United Kingdom') return '+44';
+    if (upper === 'CA' || country === 'Canada') return '+1';
+    if (upper === 'AU' || country === 'Australia') return '+61';
+    return '';
+  };
+
   const loadBusinesses = async () => {
     try {
       const res = await businessAPI.getMyBusinesses();
@@ -108,10 +117,20 @@ const ClientsPage = () => {
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
+  const selectedBiz = businesses.find(
+    (b) => b.id === (typeof selectedBusiness === 'string' ? parseInt(selectedBusiness, 10) : selectedBusiness)
+  );
+  const businessDialCode = getDialCodeForCountry(selectedBiz?.country);
+  const fullClientPhone = form.phone || '';
+  const localClientPhone =
+    businessDialCode && fullClientPhone.startsWith(businessDialCode)
+      ? fullClientPhone.slice(businessDialCode.length)
+      : fullClientPhone;
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
           <p className="text-sm text-gray-500">{total} contacts</p>
@@ -121,6 +140,39 @@ const ClientsPage = () => {
           Add Client
         </Button>
       </div>
+
+      {/* Simple "top clients" and notes hint */}
+      {clients.length > 0 && (
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="md:col-span-2 bg-indigo-50 border border-indigo-100 rounded-xl px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-indigo-700 mb-1">
+              Top clients
+            </p>
+            <p className="text-xs text-gray-600 mb-1">
+              These are your most recent frequent visitors. Keep quick notes so you remember preferences.
+            </p>
+            <div className="flex flex-wrap gap-2 mt-1">
+              {clients.slice(0, 3).map((c) => (
+                <span
+                  key={c.id}
+                  className="inline-flex items-center px-2 py-1 rounded-full bg-white border border-indigo-100 text-xs text-gray-700 shadow-sm max-w-[10rem] truncate"
+                  title={c.name}
+                >
+                  {c.name}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="bg-white border border-gray-100 rounded-xl px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-1">
+              Notes
+            </p>
+            <p className="text-xs text-gray-500">
+              Use the notes field on each client to capture preferences, allergies, or how they like to be contacted.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Create / Edit Form */}
       {showForm && (
@@ -146,13 +198,31 @@ const ClientsPage = () => {
                   onChange={(e) => handleFormChange('email', e.target.value)}
                   placeholder="jane@example.com"
                 />
-                <Input
-                  label="Phone"
-                  type="tel"
-                  value={form.phone}
-                  onChange={(e) => handleFormChange('phone', e.target.value)}
-                  placeholder="+44 7700 900000"
-                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone
+                  </label>
+                  <div className="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500">
+                    <span className="px-2 bg-gray-50 text-gray-600 text-sm flex items-center border-r border-gray-200 min-w-[3.2rem] justify-center">
+                      {businessDialCode || '+ code'}
+                    </span>
+                    <input
+                      type="tel"
+                      value={localClientPhone}
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/[^0-9]/g, '');
+                        const full = businessDialCode ? `${businessDialCode}${raw}` : raw;
+                        setForm((prev) => ({ ...prev, phone: full }));
+                      }}
+                      placeholder={businessDialCode ? 'Enter number without country code' : 'Client phone number'}
+                      className="flex-1 px-3 py-2 text-sm outline-none"
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-gray-400">
+                    Saved as {businessDialCode || ''}
+                    {localClientPhone || (businessDialCode ? '•••' : '')} for reminders.
+                  </p>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>

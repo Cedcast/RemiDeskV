@@ -20,6 +20,7 @@ import {
   BusinessManagePage,
   ClientsPage,
   BillingPage,
+  SettingsPage,
 } from './pages/business';
 import {
   AdminDashboardPage,
@@ -91,6 +92,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <BillingPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/settings"
+              element={
+                <ProtectedRoute>
+                  <SettingsPage />
                 </ProtectedRoute>
               }
             />

@@ -2,7 +2,7 @@
 import json
 import secrets
 from typing import List, Optional
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 
@@ -11,6 +11,7 @@ from ..models import User, Business, Service, Appointment, Client, UserRole, App
 from ..schemas import (
     AppointmentCreate, AppointmentUpdate, AppointmentResponse,
     AppointmentStatusUpdate, AppointmentListResponse, AppointmentDetailResponse,
+    AppointmentNotificationSummary, NotificationStepSummary,
 )
 from ..auth import get_current_user
 from ..notifications import email_service, sms_service, whatsapp_service, build_reschedule_url
@@ -36,6 +37,53 @@ def _get_owned_business(db: Session, business_id: int, owner_id: int) -> Busines
     if business.owner_id != owner_id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
     return business
+
+
+def _build_notification_summary(appointment: Appointment) -> Optional[AppointmentNotificationSummary]:
+    """Aggregate NotificationLog entries into a compact per-step summary.
+
+    Only "sent" notifications are counted. For each notification_type we
+    track whether anything was sent, the latest sent_at timestamp, and the
+    distinct channels used.
+    """
+    if not appointment.notification_logs:
+        return None
+
+    steps = {
+        "confirmation": NotificationStepSummary(),
+        "reminder_24h": NotificationStepSummary(),
+        "reminder_2h": NotificationStepSummary(),
+        "followup": NotificationStepSummary(),
+    }
+
+    for log in appointment.notification_logs:
+        if log.status != "sent":
+            continue
+        step = steps.get(log.notification_type)
+        if not step:
+            continue
+
+        step.sent = True
+        if log.sent_at:
+            if not step.sent_at or log.sent_at > step.sent_at:
+                step.sent_at = log.sent_at
+        if log.channel and log.channel not in step.channels:
+            step.channels.append(log.channel)
+
+    return AppointmentNotificationSummary(
+        confirmation=steps["confirmation"],
+        reminder_24h=steps["reminder_24h"],
+        reminder_2h=steps["reminder_2h"],
+        followup=steps["followup"],
+    )
+
+
+def _ai_messages_enabled_for_user(current_user: User) -> bool:
+    """Return True if the current user's subscription has AI notifications enabled."""
+    subscription = getattr(current_user, "subscription", None)
+    if not subscription:
+        return False
+    return bool(getattr(subscription, "ai_notifications_enabled", False))
 
 
 async def _send_notifications(appointment: Appointment, notification_type: str, db: Session):
@@ -207,6 +255,12 @@ async def list_appointments(
     page: int = Query(1, ge=1),
     size: int = Query(20, ge=1, le=100),
     status_filter: Optional[AppointmentStatus] = Query(None, alias="status"),
+    # Quick date filter: today | next_7_days | this_month
+    range_key: Optional[str] = Query(
+        None,
+        regex="^(today|next_7_days|this_month)$",
+        description="Quick date range filter for appointments",
+    ),
     business_id: Optional[int] = None,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -228,9 +282,33 @@ async def list_appointments(
     if status_filter:
         query = query.filter(Appointment.status == status_filter)
 
+    # Apply date range filters on start_time
+    if range_key:
+        now = datetime.now(timezone.utc)
+        if range_key == "today":
+            start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            end = start + timedelta(days=1)
+        elif range_key == "next_7_days":
+            start = now
+            end = now + timedelta(days=7)
+        else:  # this_month
+            start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            if start.month == 12:
+                end = start.replace(year=start.year + 1, month=1)
+            else:
+                end = start.replace(month=start.month + 1)
+
+        query = query.filter(Appointment.start_time >= start, Appointment.start_time < end)
+
     total = query.count()
     offset = (page - 1) * size
     appointments = query.order_by(Appointment.start_time.desc()).offset(offset).limit(size).all()
+
+    # Enrich each appointment with notification summary and AI flag
+    ai_enabled = _ai_messages_enabled_for_user(current_user)
+    for apt in appointments:
+        apt.notification_summary = _build_notification_summary(apt)
+        apt.ai_messages_enabled = ai_enabled
 
     return AppointmentListResponse(appointments=appointments, total=total, page=page, size=size)
 
@@ -260,6 +338,12 @@ async def get_upcoming_appointments(
         .limit(limit)
         .all()
     )
+
+    ai_enabled = _ai_messages_enabled_for_user(current_user)
+    for apt in appointments:
+        apt.notification_summary = _build_notification_summary(apt)
+        apt.ai_messages_enabled = ai_enabled
+
     return appointments
 
 

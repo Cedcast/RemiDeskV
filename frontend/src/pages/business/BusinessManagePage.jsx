@@ -20,6 +20,14 @@ const DAYS_OF_WEEK = [
   { value: 6, label: 'Sunday' },
 ];
 
+const COUNTRY_OPTIONS = [
+  { value: 'UK', label: 'United Kingdom (UK)', timezone: 'Europe/London' },
+  { value: 'CA', label: 'Canada', timezone: 'America/Toronto' },
+  { value: 'AU', label: 'Australia', timezone: 'Australia/Sydney' },
+];
+
+const getCountryMeta = (value) => COUNTRY_OPTIONS.find((c) => c.value === value) || null;
+
 const BusinessManagePage = () => {
   const [businesses, setBusinesses] = useState([]);
   const [selectedBusiness, setSelectedBusiness] = useState(null);
@@ -41,11 +49,16 @@ const BusinessManagePage = () => {
     city: '',
     state: '',
     zip_code: '',
+    country: '',
     phone: '',
     email: '',
     website: '',
+    business_type: '',
+    timezone: 'UTC',
   });
   
+  // New business type field
+
   const [serviceForm, setServiceForm] = useState({
     name: '',
     description: '',
@@ -119,6 +132,18 @@ const BusinessManagePage = () => {
     }
   };
 
+  const handleBusinessFormChange = (e) => {
+    const { name, value } = e.target;
+    setBusinessForm((prev) => {
+      if (name === 'country') {
+        const meta = getCountryMeta(value);
+        const nextTimezone = meta?.timezone || prev.timezone || 'UTC';
+        return { ...prev, country: value, timezone: nextTimezone };
+      }
+      return { ...prev, [name]: value };
+    });
+  };
+
   const handleEditBusiness = (business) => {
     setEditingBusiness(business);
     setBusinessForm({
@@ -128,9 +153,12 @@ const BusinessManagePage = () => {
       city: business.city || '',
       state: business.state || '',
       zip_code: business.zip_code || '',
+      country: business.country || '',
       phone: business.phone || '',
       email: business.email || '',
       website: business.website || '',
+      business_type: business.business_type || '',
+      timezone: business.timezone || 'UTC',
     });
     setShowBusinessForm(true);
   };
@@ -143,9 +171,12 @@ const BusinessManagePage = () => {
       city: '',
       state: '',
       zip_code: '',
+      country: '',
       phone: '',
       email: '',
       website: '',
+      business_type: '',
+      timezone: 'UTC',
     });
   };
 
@@ -256,15 +287,17 @@ const BusinessManagePage = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Business Management</h1>
+          <h1 className="text-3xl font-bold text-gray-900">My Business</h1>
           <p className="mt-2 text-gray-600">
-            Manage your businesses, services, and schedules
+            Update your business profile, services, and hours
           </p>
         </div>
-        <Button onClick={() => setShowBusinessForm(true)}>
-          <PlusIcon className="h-5 w-5 mr-1" />
-          New Business
-        </Button>
+        {businesses.length === 0 && (
+          <Button onClick={() => setShowBusinessForm(true)}>
+            <PlusIcon className="h-5 w-5 mr-1" />
+            Create Business
+          </Button>
+        )}
       </div>
 
       {/* Business Selector */}
@@ -326,6 +359,65 @@ const BusinessManagePage = () => {
                     }
                     required
                   />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Country
+                      </label>
+                      <select
+                        name="country"
+                        value={businessForm.country}
+                        onChange={handleBusinessFormChange}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                      >
+                        <option value="">Select country</option>
+                        {COUNTRY_OPTIONS.map((c) => (
+                          <option key={c.value} value={c.value}>
+                            {c.label}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="mt-1 text-xs text-gray-500">
+                        Used to normalise your timezone and phone numbers.
+                      </p>
+                    </div>
+                    <div>
+                      <Input
+                        label="Timezone"
+                        value={businessForm.timezone}
+                        onChange={(e) =>
+                          setBusinessForm({
+                            ...businessForm,
+                            timezone: e.target.value,
+                          })
+                        }
+                        placeholder="e.g. Europe/London"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Business Type
+                    </label>
+                    <select
+                      name="business_type"
+                      value={businessForm.business_type}
+                      onChange={handleBusinessFormChange}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                    >
+                      <option value="">Select a business type</option>
+                      <option value="salon">Salon</option>
+                      <option value="barber">Barber</option>
+                      <option value="vet_clinic">Vet clinic</option>
+                      <option value="therapist">Therapist / Counseling</option>
+                      <option value="gym">Gym / Fitness</option>
+                      <option value="spa">Spa / Wellness</option>
+                      <option value="other">Other service business</option>
+                    </select>
+                    <p className="mt-1 text-xs text-gray-500">
+                      This helps RemiDesk personalize reminders and insights for your niche.
+                    </p>
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Description
@@ -424,7 +516,7 @@ const BusinessManagePage = () => {
       {selectedBusiness && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Services Section */}
-          <div>
+          <div id="services">
             <Card>
               <Card.Header>
                 <div className="flex items-center justify-between">

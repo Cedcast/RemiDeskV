@@ -45,10 +45,20 @@ const AppointmentsManagePage = () => {
   const [form, setForm] = useState(defaultForm);
   const [formLoading, setFormLoading] = useState(false);
   const [filterStatus, setFilterStatus] = useState('');
+  const [dateRange, setDateRange] = useState('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
 
   const PAGE_SIZE = 15;
+
+  const getDialCodeForCountry = (country) => {
+    if (!country) return '';
+    const upper = country.toUpperCase();
+    if (upper === 'UK' || upper === 'GB' || country === 'United Kingdom') return '+44';
+    if (upper === 'CA' || country === 'Canada') return '+1';
+    if (upper === 'AU' || country === 'Australia') return '+61';
+    return '';
+  };
 
   const loadBusinesses = async () => {
     try {
@@ -66,6 +76,7 @@ const AppointmentsManagePage = () => {
       const params = { page, size: PAGE_SIZE };
       if (selectedBusiness) params.business_id = selectedBusiness;
       if (filterStatus) params.status = filterStatus;
+      if (dateRange) params.range_key = dateRange;
       const res = await appointmentAPI.list(params);
       setAppointments(res.data.appointments);
       setTotal(res.data.total);
@@ -74,7 +85,7 @@ const AppointmentsManagePage = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, selectedBusiness, filterStatus]);
+  }, [page, selectedBusiness, filterStatus, dateRange]);
 
   useEffect(() => { loadBusinesses(); }, []);
   useEffect(() => { loadAppointments(); }, [loadAppointments]);
@@ -140,6 +151,16 @@ const AppointmentsManagePage = () => {
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
+  const selectedBiz = businesses.find(
+    (b) => b.id === (typeof selectedBusiness === 'string' ? parseInt(selectedBusiness, 10) : selectedBusiness)
+  );
+  const businessDialCode = getDialCodeForCountry(selectedBiz?.country);
+  const fullClientPhone = form.client_phone || '';
+  const localClientPhone =
+    businessDialCode && fullClientPhone.startsWith(businessDialCode)
+      ? fullClientPhone.slice(businessDialCode.length)
+      : fullClientPhone;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
@@ -178,6 +199,73 @@ const AppointmentsManagePage = () => {
                 </div>
               )}
 
+              {/* Filters */}
+              <div className="flex flex-wrap items-center gap-3 mb-4">
+                {businesses.length > 1 && (
+                  <select
+                    value={selectedBusiness}
+                    onChange={(e) => { setSelectedBusiness(e.target.value); setPage(1); }}
+                    className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-indigo-500"
+                  >
+                    {businesses.map((b) => (
+                      <option key={b.id} value={b.id}>{b.name}</option>
+                    ))}
+                  </select>
+                )}
+
+                <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+                  <span className="text-gray-500 mr-1">Status:</span>
+                  <button
+                    type="button"
+                    onClick={() => { setFilterStatus(''); setPage(1); }}
+                    className={`px-2 py-1 rounded-full border text-xs sm:text-[13px] ${
+                      !filterStatus
+                        ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
+                        : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    All
+                  </button>
+                  {STATUSES.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => { setFilterStatus(s); setPage(1); }}
+                      className={`px-2 py-1 rounded-full border capitalize text-xs sm:text-[13px] ${
+                        filterStatus === s
+                          ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
+                          : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+                      }`}
+                    >
+                      {s.replace('_', ' ')}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+                  <span className="text-gray-500 mr-1">Date:</span>
+                  {[
+                    { key: '', label: 'All' },
+                    { key: 'today', label: 'Today' },
+                    { key: 'next_7_days', label: 'Next 7 days' },
+                    { key: 'this_month', label: 'This month' },
+                  ].map(({ key, label }) => (
+                    <button
+                      key={key || 'all'}
+                      type="button"
+                      onClick={() => { setDateRange(key); setPage(1); }}
+                      className={`px-2 py-1 rounded-full border text-xs sm:text-[13px] ${
+                        dateRange === key
+                          ? 'bg-amber-50 border-amber-200 text-amber-700'
+                          : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <Input
                   label="Client Name"
@@ -192,13 +280,31 @@ const AppointmentsManagePage = () => {
                   onChange={(e) => handleFormChange('client_email', e.target.value)}
                   placeholder="john@example.com"
                 />
-                <Input
-                  label="Client Phone"
-                  type="tel"
-                  value={form.client_phone}
-                  onChange={(e) => handleFormChange('client_phone', e.target.value)}
-                  placeholder="+44 7700 900000"
-                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Client Phone
+                  </label>
+                  <div className="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500">
+                    <span className="px-2 bg-gray-50 text-gray-600 text-sm flex items-center border-r border-gray-200 min-w-[3.2rem] justify-center">
+                      {businessDialCode || '+ code'}
+                    </span>
+                    <input
+                      type="tel"
+                      value={localClientPhone}
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/[^0-9]/g, '');
+                        const full = businessDialCode ? `${businessDialCode}${raw}` : raw;
+                        setForm((prev) => ({ ...prev, client_phone: full }));
+                      }}
+                      placeholder={businessDialCode ? 'Enter number without country code' : 'Client phone number'}
+                      className="flex-1 px-3 py-2 text-sm outline-none"
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-gray-400">
+                    Saved as {businessDialCode || ''}
+                    {localClientPhone || (businessDialCode ? '•••' : '')} for SMS/WhatsApp reminders.
+                  </p>
+                </div>
               </div>
 
               <Input
@@ -345,20 +451,61 @@ const AppointmentsManagePage = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {appointments.map((apt) => (
-                <tr key={apt.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <p className="text-sm font-medium text-gray-800">
-                      {format(new Date(apt.start_time), 'EEE d MMM yyyy')}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      {format(new Date(apt.start_time), 'HH:mm')} –{' '}
-                      {format(new Date(apt.end_time), 'HH:mm')}
-                    </p>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700">
-                    {apt.service_name || '—'}
-                  </td>
+              {appointments.map((apt) => {
+                const summary = apt.notification_summary || {};
+                const steps = [
+                  { key: 'confirmation', label: 'Booked' },
+                  { key: 'reminder_24h', label: '24h' },
+                  { key: 'reminder_2h', label: '2h' },
+                  { key: 'followup', label: 'Follow-up' },
+                ];
+
+                return (
+                  <tr key={apt.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 whitespace-nowrap align-top">
+                      <p className="text-sm font-medium text-gray-800">
+                        {format(new Date(apt.start_time), 'EEE d MMM yyyy')}
+                      </p>
+                      <p className="text-xs text-gray-400 mb-1">
+                        {format(new Date(apt.start_time), 'HH:mm')} –{' '}
+                        {format(new Date(apt.end_time), 'HH:mm')}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        {steps.map(({ key, label }) => {
+                          const step = summary[key];
+                          const sent = step?.sent;
+                          return (
+                            <div key={key} className="flex flex-col items-center">
+                              <span
+                                className={`h-2.5 w-2.5 rounded-full border ${
+                                  sent
+                                    ? 'bg-emerald-500 border-emerald-500'
+                                    : 'bg-gray-100 border-gray-300'
+                                }`}
+                                title={
+                                  sent && step?.sent_at
+                                    ? `${label} sent via ${(step.channels || []).join(
+                                        ', '
+                                      )} on ${format(new Date(step.sent_at), 'd MMM HH:mm')}`
+                                    : `${label} not sent yet`
+                                }
+                              />
+                              <span className="mt-0.5 text-[10px] text-gray-400">{label}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700 align-top">
+                      <div className="flex items-center gap-2">
+                        <span>{apt.service_name || '—'}</span>
+                        {apt.ai_messages_enabled && (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+                            AI-powered
+                          </span>
+                        )}
+                      </div>
+                    </td>
                   <td className="px-4 py-3">
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[apt.status] || 'bg-gray-100 text-gray-700'}`}
@@ -391,8 +538,9 @@ const AppointmentsManagePage = () => {
                       )}
                     </div>
                   </td>
-                </tr>
-              ))}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
 
