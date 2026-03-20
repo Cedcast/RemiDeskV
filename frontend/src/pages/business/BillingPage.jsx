@@ -29,6 +29,125 @@ const STATUS_LABELS = {
 
 const CURRENCY = { code: 'USD', symbol: '$', flag: '🇺🇸' };
 
+const PLAN_PRICES = {
+  premium: '15.00',
+  pro: '38.99',
+};
+
+const PLAN_FEATURES = {
+  premium: [
+    'Up to 50 appointments/month',
+    'Email & SMS notifications',
+    'Basic dashboard',
+    '180-day analytics view (read-only after 90 days)',
+    'Email support',
+  ],
+  pro: [
+    'Unlimited appointments',
+    'Email, SMS & WhatsApp notifications',
+    'Advanced analytics & reporting',
+    '1-year data retention',
+    'API access & priority support',
+  ],
+};
+
+const PlansModal = ({ isOpen, onClose, onSelectPlan }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">Choose your plan</h2>
+            <p className="text-sm text-gray-500">
+              Compare Premium and Pro, then confirm to continue checkout.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 rounded-full p-1"
+          >
+            <span className="sr-only">Close</span>
+            ×
+          </button>
+        </div>
+
+        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Premium */}
+          <div className="border border-gray-200 rounded-xl p-4 flex flex-col">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-base font-semibold text-gray-900">RemiDesk Premium</h3>
+              <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-blue-50 text-blue-700">
+                Starter
+              </span>
+            </div>
+            <p className="text-sm text-gray-500 mb-4">
+              For lean teams getting started with automated reminders.
+            </p>
+            <div className="mb-4">
+              <span className="text-2xl font-bold text-gray-900">${PLAN_PRICES.premium}</span>
+              <span className="text-sm text-gray-500">/month</span>
+            </div>
+            <ul className="space-y-2 text-sm text-gray-600 flex-1">
+              {PLAN_FEATURES.premium.map((f) => (
+                <li key={f} className="flex items-start gap-2">
+                  <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-blue-500" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+            <button
+              type="button"
+              onClick={() => onSelectPlan('premium')}
+              className="mt-4 w-full inline-flex justify-center items-center px-4 py-2.5 rounded-xl bg-indigo-50 text-indigo-700 text-sm font-semibold hover:bg-indigo-100 transition-colors"
+            >
+              Choose Premium
+            </button>
+          </div>
+
+          {/* Pro */}
+          <div className="border border-indigo-200 rounded-xl p-4 bg-indigo-50/60 flex flex-col">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-base font-semibold text-gray-900">RemiDesk Pro</h3>
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-600 text-white">
+                Best for growth
+              </span>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              For busy teams that need unlimited bookings and AI.
+            </p>
+            <div className="mb-4">
+              <span className="text-2xl font-bold text-gray-900">${PLAN_PRICES.pro}</span>
+              <span className="text-sm text-gray-600">/month</span>
+            </div>
+            <ul className="space-y-2 text-sm text-gray-700 flex-1">
+              {PLAN_FEATURES.pro.map((f) => (
+                <li key={f} className="flex items-start gap-2">
+                  <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-indigo-600" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+            <button
+              type="button"
+              onClick={() => onSelectPlan('pro')}
+              className="mt-4 w-full inline-flex justify-center items-center px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors"
+            >
+              Choose Pro
+            </button>
+          </div>
+        </div>
+
+        <div className="px-6 pb-4 pt-1 text-xs text-gray-400 border-t border-gray-100 text-center">
+          You can change or cancel your plan anytime from this billing page.
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const BillingPage = () => {
   const location = useLocation();
   const [subscription, setSubscription] = useState(null);
@@ -36,6 +155,7 @@ const BillingPage = () => {
   const [loading, setLoading] = useState(true);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [checkoutTier, setCheckoutTier] = useState('pro');
+    const [plansOpen, setPlansOpen] = useState(false);
   const [cancelling, setCancelling] = useState(false);
 
   // Handle Paystack redirect back
@@ -75,7 +195,6 @@ const BillingPage = () => {
         billingAPI.getPayments(),
       ]);
       setSubscription(subRes.data);
-      if (subRes.data.currency) setCurrency(subRes.data.currency);
       setPayments(payRes.data);
     } catch {
       toast.error('Could not load billing information.');
@@ -128,6 +247,11 @@ const BillingPage = () => {
     setSubscription(newSub);
     setCheckoutOpen(false);
     loadSubscription();
+  };
+
+  const handleSelectPlan = (tier) => {
+    setPlansOpen(false);
+    openUpgrade(tier);
   };
 
   if (loading) {
@@ -314,12 +438,13 @@ const BillingPage = () => {
                   {cancelling ? 'Cancelling...' : 'Cancel Subscription'}
                 </button>
               )}
-              <Link
-                to="/pricing"
+              <button
+                type="button"
+                onClick={() => setPlansOpen(true)}
                 className="px-4 py-2 border border-gray-300 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors"
               >
                 View All Plans
-              </Link>
+              </button>
             </div>
           </div>
         ) : (
@@ -392,6 +517,12 @@ const BillingPage = () => {
         onClose={() => setCheckoutOpen(false)}
         tier={checkoutTier}
         onSuccess={onCheckoutSuccess}
+      />
+      {/* Plan selection modal */}
+      <PlansModal
+        isOpen={plansOpen}
+        onClose={() => setPlansOpen(false)}
+        onSelectPlan={handleSelectPlan}
       />
     </div>
   );

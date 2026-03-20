@@ -52,14 +52,22 @@ const CARD_COLORS = {
 const StatCard = ({ title, value, icon: Icon, color = 'indigo', subtitle }) => {
   const { bg, text } = CARD_COLORS[color] || CARD_COLORS.indigo;
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-start gap-4">
-      <div className={`p-3 rounded-lg ${bg}`}>
-        <Icon className={`h-6 w-6 ${text}`} />
-      </div>
-      <div>
-        <p className="text-sm text-gray-500">{title}</p>
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
-        {subtitle && <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>}
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-2xl font-bold text-gray-900 leading-tight">{value}</p>
+          <p className="mt-1 text-xs sm:text-sm text-gray-500 break-words">
+            {title}
+          </p>
+          {subtitle && (
+            <p className="text-[11px] text-gray-400 mt-1 truncate sm:whitespace-normal">
+              {subtitle}
+            </p>
+          )}
+        </div>
+        <div className={`p-2.5 sm:p-3 rounded-lg flex-shrink-0 ${bg}`}>
+          <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${text}`} />
+        </div>
       </div>
     </div>
   );

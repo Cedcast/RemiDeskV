@@ -18,8 +18,8 @@ const navLinks = [
   { name: 'Calendar', href: '/dashboard/appointments', icon: CalendarIcon },
   { name: 'Clients', href: '/dashboard/clients', icon: UserGroupIcon },
   { name: 'Billing & Plan', href: '/dashboard/billing', icon: CreditCardIcon },
-  { name: 'Settings', href: '/dashboard/settings', icon: Cog6ToothIcon },
   { name: 'Reschedule Insights', href: '/dashboard/insights/reschedules', icon: CalendarDaysIcon },
+  { name: 'Settings', href: '/dashboard/settings', icon: Cog6ToothIcon },
 ];
 
 const OwnerLayout = () => {
