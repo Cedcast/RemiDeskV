@@ -15,10 +15,10 @@ from .config import settings
 
 PRICING: Dict[str, Dict[str, Dict[str, Any]]] = {
     "premium": {
-        "USD": {"amount": 1200, "symbol": "$", "label": "$12.00"},
+        "USD": {"amount": 1500, "symbol": "$", "label": "$15.00"},
     },
     "pro": {
-        "USD": {"amount": 3900, "symbol": "$", "label": "$39.00"},
+        "USD": {"amount": 3899, "symbol": "$", "label": "$38.99"},
     },
 }
 

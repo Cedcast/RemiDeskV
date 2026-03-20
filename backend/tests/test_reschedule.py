@@ -10,9 +10,14 @@ from src.models import Appointment, AppointmentStatus, Business, Client, User, U
 # ── Fixtures ──────────────────────────────────────────────────────────────────
 
 @pytest.fixture
-def business_owner_with_token(client, test_user_data):
-    """Register a business owner and return their auth token."""
+def business_owner_with_token(client, test_user_data, db):
+    """Register a business owner, auto-verify, and return their auth token."""
     client.post("/api/auth/register", json=test_user_data)
+    # Auto-verify for testing
+    from src.models import User
+    user = db.query(User).filter(User.email == test_user_data["email"]).first()
+    user.is_verified = True
+    db.commit()
     res = client.post("/api/auth/token", json={
         "email": test_user_data["email"],
         "password": test_user_data["password"],

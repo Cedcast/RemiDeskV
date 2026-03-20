@@ -56,7 +56,7 @@ const TermsOfService = () => {
         <Section title="4. Billing and Payment Terms">
           <p>
             RemiDesk offers subscription plans (Premium and Pro) billed monthly. All prices are displayed in your
-            selected currency (USD, GBP, CAD, or AUD). A 3-day free trial is available with no credit card required.
+            selected currency (USD, GBP, CAD, or AUD). A 7-day free trial is available with no credit card required.
           </p>
           <ul className="list-disc list-inside space-y-2 pl-2">
             <li>Subscriptions automatically renew at the end of each billing period.</li>

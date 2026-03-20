@@ -30,7 +30,14 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('access_token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+
+      // In production, force a redirect to the login page on 401.
+      // In local development, avoid an automatic redirect so that
+      // you can see the actual error on the dashboard instead of
+      // being kicked back to the login screen.
+      if (import.meta.env.PROD) {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
@@ -39,7 +46,14 @@ api.interceptors.response.use(
 // Auth API
 export const authAPI = {
   register: (userData) => api.post('/auth/register', userData),
-  login: (credentials) => api.post('/auth/token', credentials),
+  login: (email, password) => {
+    const form = new URLSearchParams();
+    form.append('username', email);
+    form.append('password', password);
+    return api.post('/auth/login', form, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+  },
   getCurrentUser: () => api.get('/auth/me'),
 };
 

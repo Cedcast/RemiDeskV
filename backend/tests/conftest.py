@@ -83,18 +83,28 @@ def test_business_owner_data():
 
 
 @pytest.fixture
-def registered_user(client, test_user_data):
-    """Create and return a registered user."""
+def registered_user(client, test_user_data, db):
+    """Create and return a registered user (auto-verified for tests)."""
     response = client.post("/api/auth/register", json=test_user_data)
     assert response.status_code == 201
+    # Auto-verify for testing (email verification requires SendGrid)
+    from src.models import User
+    user = db.query(User).filter(User.email == test_user_data["email"]).first()
+    user.is_verified = True
+    db.commit()
     return response.json()
 
 
 @pytest.fixture
-def registered_business_owner(client, test_business_owner_data):
-    """Create and return a registered business owner."""
+def registered_business_owner(client, test_business_owner_data, db):
+    """Create and return a registered business owner (auto-verified for tests)."""
     response = client.post("/api/auth/register", json=test_business_owner_data)
     assert response.status_code == 201
+    # Auto-verify for testing (email verification requires SendGrid)
+    from src.models import User
+    user = db.query(User).filter(User.email == test_business_owner_data["email"]).first()
+    user.is_verified = True
+    db.commit()
     return response.json()
 
 

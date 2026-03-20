@@ -4,8 +4,8 @@ import { billingAPI } from '../../services/api';
 import toast from 'react-hot-toast';
 
 const PRICES = {
-  premium: '$12.00',
-  pro: '$39.00',
+  premium: '$15.00',
+  pro: '$38.99',
 };
 
 // Paystack checkout — single payment flow
