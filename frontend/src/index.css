@@ -1,145 +1,18 @@
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
+@import "tailwindcss";
 
-.hero {
-  background: linear-gradient(to right, #4f46e5, #3b82f6);
-  color: white;
-  padding: 80px 0;
-  text-align: center;
-}
+/* Corporate Theme - Option A */
 
-.subheadline {
-  font-size: 1.2rem;
-  color: #ffffff;
-}
-
-.primary-btn {
-  background-color: #3b82f6;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.primary-btn:hover {
-  background-color: #2563eb;
+body {
+    background-color: #FFFFFF;
+    color: #333333;
 }
 
 .small-text {
-  font-size: 0.875rem;
-  color: #6b7280;
+    color: #FFFFFF; 
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.demo-box {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 20px;
-  margin: 10px 0;
+.signup-form input[name="phone"] {
+    border: 1px solid #CCCCCC;
+    padding: 10px;
 }
-
-.demo-label {
-  font-weight: bold;
-}
-
-.message-preview {
-  background: white;
-  border: 1px solid #e5e7eb;
-  padding: 15px;
-  border-radius: 5px;
-}
-
-.target-text {
-  color: #4f46e5;
-}
-
-.how-it-works {
-  background-color: #f9fafb;
-  padding: 40px 0;
-}
-
-.steps {
-  display: flex;
-  justify-content: space-around;
-}
-
-.step {
-  flex: 1;
-  padding: 20px;
-  text-align: center;
-}
-
-.pricing {
-  background-color: #ffffff;
-  padding: 40px 0;
-}
-
-.plans {
-  display: flex;
-  justify-content: space-around;
-}
-
-.plan {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 20px;
-  text-align: center;
-}
-
-.plan.popular {
-  border-color: #3b82f6;
-  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
-}
-
-.testimonials {
-  background-color: #f9fafb;
-  padding: 40px 0;
-}
-
-.testimonial-cards {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-}
-
-.testimonial {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 20px;
-  margin: 10px;
-  flex: 0 0 30%;
-}
-
-.signup {
-  padding: 40px 0;
-}
-
-.signup-form {
-  display: flex;
-  flex-direction: column;
-}
-
-input {
-  padding: 10px;
-  margin: 5px 0;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
-}
-
-body {
-  font-family: 'Inter', sans-serif;
-  margin: 0;
-}
-
-#root {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
