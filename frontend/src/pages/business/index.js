@@ -4,3 +4,4 @@ export { default as BusinessManagePage } from './BusinessManagePage';
 export { default as ClientsPage } from './ClientsPage';
 export { default as BillingPage } from './BillingPage';
 export { default as SettingsPage } from './SettingsPage';
+export { default as RescheduleInsightsPage } from './RescheduleInsightsPage';

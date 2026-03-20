@@ -57,6 +57,11 @@ export const authAPI = {
   getCurrentUser: () => api.get('/auth/me'),
 };
 
+// User profile API
+export const userAPI = {
+  updateProfile: (data) => api.put('/users/me', data),
+};
+
 // Business API
 export const businessAPI = {
   list: (params) => api.get('/businesses', { params }),
@@ -101,6 +106,13 @@ export const appointmentAPI = {
 export const analyticsAPI = {
   getStats: (businessId) =>
     api.get('/analytics/stats', { params: businessId ? { business_id: businessId } : {} }),
+  getReschedules: ({ businessId, days } = {}) =>
+    api.get('/analytics/reschedules', {
+      params: {
+        ...(businessId ? { business_id: businessId } : {}),
+        ...(days ? { days } : {}),
+      },
+    }),
 };
 
 // Availability API

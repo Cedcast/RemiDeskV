@@ -21,6 +21,7 @@ import {
   ClientsPage,
   BillingPage,
   SettingsPage,
+  RescheduleInsightsPage,
 } from './pages/business';
 import {
   AdminDashboardPage,
@@ -68,6 +69,10 @@ function App() {
             <Route path="/dashboard/clients" element={<ClientsPage />} />
             <Route path="/dashboard/billing" element={<BillingPage />} />
             <Route path="/dashboard/settings" element={<SettingsPage />} />
+            <Route
+              path="/dashboard/insights/reschedules"
+              element={<RescheduleInsightsPage />}
+            />
           </Route>
 
           {/* Superadmin protected routes */}

@@ -44,6 +44,7 @@ class UserUpdate(BaseModel):
     """Schema for updating a user."""
     full_name: Optional[str] = None
     phone: Optional[str] = None
+    email: Optional[EmailStr] = None
     is_active: Optional[bool] = None
 
 
@@ -434,6 +435,42 @@ class DashboardStats(BaseModel):
     total_clients: int
     average_duration_minutes: float
     monthly_trend: List[MonthlyCount]
+
+
+class RescheduleServiceBreakdown(BaseModel):
+    """Reschedule counts grouped by service."""
+    service_name: str
+    count: int
+
+
+class RescheduleDowBreakdown(BaseModel):
+    """Reschedule counts grouped by day of week."""
+    day_of_week: int  # 0=Monday
+    count: int
+
+
+class RescheduleRecentItem(BaseModel):
+    """Recent rescheduled appointment entry for insights page."""
+    id: int
+    business_id: int
+    client_name: Optional[str]
+    service_name: Optional[str]
+    original_start_time: Optional[datetime] = None
+    new_start_time: datetime
+    status: AppointmentStatus
+
+
+class RescheduleInsightsResponse(BaseModel):
+    """Reschedule insights for a business owner dashboard."""
+    total_rescheduled: int
+    reschedule_rate: float
+    unique_clients: int
+    avg_days_before_reschedule: float
+    no_show_after_reschedule: int
+    total_appointments_in_range: int
+    service_breakdown: List[RescheduleServiceBreakdown]
+    dow_breakdown: List[RescheduleDowBreakdown]
+    recent_reschedules: List[RescheduleRecentItem]
 
 
 # ============ Reschedule Portal Schemas ============

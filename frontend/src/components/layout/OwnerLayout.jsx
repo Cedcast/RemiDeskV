@@ -19,6 +19,7 @@ const navLinks = [
   { name: 'Clients', href: '/dashboard/clients', icon: UserGroupIcon },
   { name: 'Billing & Plan', href: '/dashboard/billing', icon: CreditCardIcon },
   { name: 'Settings', href: '/dashboard/settings', icon: Cog6ToothIcon },
+  { name: 'Reschedule Insights', href: '/dashboard/insights/reschedules', icon: CalendarDaysIcon },
 ];
 
 const OwnerLayout = () => {
@@ -38,18 +39,18 @@ const OwnerLayout = () => {
   };
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-slate-900 text-slate-100">
       {/* Logo */}
-      <div className="flex items-center h-16 px-6 border-b border-gray-200 bg-white">
-        <CalendarDaysIcon className="h-8 w-8 text-indigo-600" />
-        <span className="ml-2 text-lg font-bold text-gray-900">RemiDesk</span>
-        <span className="ml-2 text-xs font-semibold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
+      <div className="flex items-center h-16 px-6 border-b border-slate-800">
+        <CalendarDaysIcon className="h-8 w-8 text-indigo-400" />
+        <span className="ml-2 text-lg font-bold text-white">RemiDesk</span>
+        <span className="ml-2 text-xs font-semibold bg-indigo-600 text-white px-2 py-0.5 rounded-full">
           BUSINESS
         </span>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto bg-gray-50">
+      <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
         {navLinks.map((link) => {
           const active = isActive(link);
           return (
@@ -60,7 +61,7 @@ const OwnerLayout = () => {
               className={`flex items-center px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 active
                   ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                  : 'text-slate-200 hover:bg-slate-800 hover:text-white'
               }`}
             >
               <link.icon className="h-5 w-5 mr-3 flex-shrink-0" />
@@ -71,19 +72,19 @@ const OwnerLayout = () => {
       </nav>
 
       {/* User info + logout */}
-      <div className="px-4 py-4 border-t border-gray-200 bg-white">
+      <div className="px-4 py-4 border-t border-slate-800">
         <div className="flex items-center mb-3">
-          <div className="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-sm font-semibold">
+          <div className="h-9 w-9 rounded-full bg-indigo-500/20 border border-indigo-400 flex items-center justify-center text-indigo-200 text-sm font-semibold">
             {user?.full_name?.[0] ?? '?'}
           </div>
           <div className="ml-3 overflow-hidden">
-            <p className="text-sm font-medium text-gray-900 truncate">{user?.full_name}</p>
-            <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+            <p className="text-sm font-medium text-white truncate">{user?.full_name}</p>
+            <p className="text-xs text-slate-400 truncate">{user?.email}</p>
           </div>
         </div>
         <button
           onClick={handleLogout}
-          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:text-red-600 hover:bg-gray-50 rounded-lg transition-colors"
+          className="flex items-center w-full px-4 py-2 text-sm text-slate-200 hover:text-red-200 hover:bg-slate-800 rounded-lg transition-colors"
         >
           <ArrowRightOnRectangleIcon className="h-5 w-5 mr-2" />
           Logout
@@ -96,7 +97,7 @@ const OwnerLayout = () => {
     <div className="flex h-screen bg-gray-50">
       {/* Desktop sidebar */}
       <div className="hidden lg:flex lg:flex-shrink-0">
-        <div className="w-64 border-r border-gray-200 bg-white flex flex-col">
+        <div className="w-64 bg-slate-900 flex flex-col">
           <SidebarContent />
         </div>
       </div>
@@ -108,15 +109,15 @@ const OwnerLayout = () => {
             className="fixed inset-0 bg-black bg-opacity-40"
             onClick={() => setSidebarOpen(false)}
           />
-          <div className="fixed inset-y-0 left-0 w-64 bg-white z-50 flex flex-col shadow-xl">
-            <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
+          <div className="fixed inset-y-0 left-0 w-64 bg-slate-900 z-50 flex flex-col shadow-xl">
+            <div className="flex items-center justify-between h-16 px-4 border-b border-slate-800">
               <div className="flex items-center">
-                <CalendarDaysIcon className="h-7 w-7 text-indigo-600" />
-                <span className="ml-2 text-base font-semibold text-gray-900">RemiDesk</span>
+                <CalendarDaysIcon className="h-7 w-7 text-indigo-400" />
+                <span className="ml-2 text-base font-semibold text-white">RemiDesk</span>
               </div>
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                className="p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-800"
               >
                 <XMarkIcon className="h-5 w-5" />
               </button>

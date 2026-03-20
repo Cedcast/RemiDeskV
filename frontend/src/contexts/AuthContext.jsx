@@ -48,6 +48,19 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const refreshUser = async () => {
+    try {
+      const response = await authAPI.getCurrentUser();
+      setUser(response.data);
+      localStorage.setItem('user', JSON.stringify(response.data));
+    } catch {
+      // If refresh fails, clear auth state
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('user');
+      setUser(null);
+    }
+  };
+
   const isBusinessOwner = () => user?.role === 'business_owner';
   const isAdmin = () => user?.role === 'admin';
   const isCustomer = () => user?.role === 'customer';
@@ -60,6 +73,7 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
+        refreshUser,
         isBusinessOwner,
         isAdmin,
         isCustomer,

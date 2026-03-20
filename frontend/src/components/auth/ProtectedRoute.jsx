@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { FullPageLoading } from '../common/Loading';
 
 export const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, isAdmin, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -12,6 +12,11 @@ export const ProtectedRoute = ({ children }) => {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Platform admins should not access business owner dashboard routes
+  if (isAdmin()) {
+    return <Navigate to="/admin" replace />;
   }
 
   return children;
