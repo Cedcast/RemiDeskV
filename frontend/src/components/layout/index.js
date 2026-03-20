@@ -1,3 +1,4 @@
 export { default as Layout } from './Layout';
 export { default as Navbar } from './Navbar';
 export { default as AdminLayout } from './AdminLayout';
+export { default as OwnerLayout } from './OwnerLayout';

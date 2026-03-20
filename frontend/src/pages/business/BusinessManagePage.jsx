@@ -112,6 +112,18 @@ const BusinessManagePage = () => {
     }
   };
 
+  const handleCreateStarterServices = async () => {
+    if (!selectedBusiness) return;
+    try {
+      await serviceAPI.createStarterForBusiness(selectedBusiness.id);
+      toast.success('Starter services added for this business');
+      fetchServicesAndSchedules();
+    } catch (err) {
+      const message = err.response?.data?.detail || 'Failed to add starter services';
+      toast.error(message);
+    }
+  };
+
   // Business handlers
   const handleBusinessSubmit = async (e) => {
     e.preventDefault();
@@ -529,8 +541,32 @@ const BusinessManagePage = () => {
               </Card.Header>
               <Card.Body className="p-0">
                 {services.length === 0 ? (
-                  <div className="p-6 text-center text-gray-500">
-                    No services yet. Add your first service.
+                  <div className="p-6 text-center text-gray-500 space-y-3">
+                    <p className="text-sm">No services yet for this business.</p>
+                    {selectedBusiness?.business_type ? (
+                      <>
+                        <p className="text-xs text-gray-500">
+                          Based on your business type, we can add a few common starter services
+                          for you. You can edit or remove them anytime.
+                        </p>
+                        <div className="flex justify-center gap-2">
+                          <Button size="sm" onClick={handleCreateStarterServices}>
+                            Add starter services
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setShowServiceForm(true)}
+                          >
+                            Add custom service
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <Button size="sm" onClick={() => setShowServiceForm(true)}>
+                        Add your first service
+                      </Button>
+                    )}
                   </div>
                 ) : (
                   <div className="divide-y divide-gray-200">

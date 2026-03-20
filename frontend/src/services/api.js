@@ -74,6 +74,7 @@ export const serviceAPI = {
   create: (data) => api.post('/services', data),
   update: (id, data) => api.put(`/services/${id}`, data),
   delete: (id) => api.delete(`/services/${id}`),
+  createStarterForBusiness: (businessId) => api.post(`/services/business/${businessId}/starter`),
 };
 
 // Client API

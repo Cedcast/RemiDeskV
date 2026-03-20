@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { appointmentAPI, businessAPI } from '../../services/api';
+import { appointmentAPI, businessAPI, serviceAPI } from '../../services/api';
 import { Button, Input, Card } from '../../components/common';
 import {
   PlusIcon,
@@ -30,6 +30,7 @@ const defaultForm = {
   client_email: '',
   client_phone: '',
   service_name: '',
+  // service_id is derived from selection when using existing services
   start_time: '',
   end_time: '',
   notes: '',
@@ -48,6 +49,9 @@ const AppointmentsManagePage = () => {
   const [dateRange, setDateRange] = useState('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [services, setServices] = useState([]);
+  const [servicesLoading, setServicesLoading] = useState(false);
+  const [selectedServiceId, setSelectedServiceId] = useState('');
 
   const PAGE_SIZE = 15;
 
@@ -87,8 +91,27 @@ const AppointmentsManagePage = () => {
     }
   }, [page, selectedBusiness, filterStatus, dateRange]);
 
+  const loadServices = useCallback(async () => {
+    if (!selectedBusiness) {
+      setServices([]);
+      return;
+    }
+    setServicesLoading(true);
+    try {
+      const res = await serviceAPI.getByBusiness(
+        typeof selectedBusiness === 'string' ? parseInt(selectedBusiness, 10) : selectedBusiness
+      );
+      setServices(res.data || []);
+    } catch {
+      setServices([]);
+    } finally {
+      setServicesLoading(false);
+    }
+  }, [selectedBusiness]);
+
   useEffect(() => { loadBusinesses(); }, []);
   useEffect(() => { loadAppointments(); }, [loadAppointments]);
+  useEffect(() => { loadServices(); }, [loadServices]);
 
   const handleFormChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -117,12 +140,18 @@ const AppointmentsManagePage = () => {
 
     setFormLoading(true);
     try {
+      const businessIdInt =
+        typeof selectedBusiness === 'string'
+          ? parseInt(selectedBusiness, 10)
+          : selectedBusiness;
+
       await appointmentAPI.create({
         business_id: parseInt(selectedBusiness),
         client_name: form.client_name || undefined,
         client_email: form.client_email || undefined,
         client_phone: form.client_phone || undefined,
-        service_name: form.service_name || undefined,
+        service_id: selectedServiceId ? parseInt(selectedServiceId, 10) : undefined,
+        service_name: selectedServiceId ? undefined : form.service_name || undefined,
         start_time: new Date(form.start_time).toISOString(),
         end_time: new Date(form.end_time).toISOString(),
         notes: form.notes || undefined,
@@ -130,6 +159,7 @@ const AppointmentsManagePage = () => {
       });
       toast.success('Appointment created!');
       setForm(defaultForm);
+      setSelectedServiceId('');
       setShowForm(false);
       loadAppointments();
     } catch (err) {
@@ -199,73 +229,6 @@ const AppointmentsManagePage = () => {
                 </div>
               )}
 
-              {/* Filters */}
-              <div className="flex flex-wrap items-center gap-3 mb-4">
-                {businesses.length > 1 && (
-                  <select
-                    value={selectedBusiness}
-                    onChange={(e) => { setSelectedBusiness(e.target.value); setPage(1); }}
-                    className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-indigo-500"
-                  >
-                    {businesses.map((b) => (
-                      <option key={b.id} value={b.id}>{b.name}</option>
-                    ))}
-                  </select>
-                )}
-
-                <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
-                  <span className="text-gray-500 mr-1">Status:</span>
-                  <button
-                    type="button"
-                    onClick={() => { setFilterStatus(''); setPage(1); }}
-                    className={`px-2 py-1 rounded-full border text-xs sm:text-[13px] ${
-                      !filterStatus
-                        ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
-                        : 'border-gray-200 text-gray-500 hover:bg-gray-50'
-                    }`}
-                  >
-                    All
-                  </button>
-                  {STATUSES.map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => { setFilterStatus(s); setPage(1); }}
-                      className={`px-2 py-1 rounded-full border capitalize text-xs sm:text-[13px] ${
-                        filterStatus === s
-                          ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
-                          : 'border-gray-200 text-gray-500 hover:bg-gray-50'
-                      }`}
-                    >
-                      {s.replace('_', ' ')}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
-                  <span className="text-gray-500 mr-1">Date:</span>
-                  {[
-                    { key: '', label: 'All' },
-                    { key: 'today', label: 'Today' },
-                    { key: 'next_7_days', label: 'Next 7 days' },
-                    { key: 'this_month', label: 'This month' },
-                  ].map(({ key, label }) => (
-                    <button
-                      key={key || 'all'}
-                      type="button"
-                      onClick={() => { setDateRange(key); setPage(1); }}
-                      className={`px-2 py-1 rounded-full border text-xs sm:text-[13px] ${
-                        dateRange === key
-                          ? 'bg-amber-50 border-amber-200 text-amber-700'
-                          : 'border-gray-200 text-gray-500 hover:bg-gray-50'
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <Input
                   label="Client Name"
@@ -307,12 +270,50 @@ const AppointmentsManagePage = () => {
                 </div>
               </div>
 
-              <Input
-                label="Service / Description"
-                value={form.service_name}
-                onChange={(e) => handleFormChange('service_name', e.target.value)}
-                placeholder="e.g. Haircut, Consultation, Massage…"
-              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Service
+                  </label>
+                  {servicesLoading ? (
+                    <p className="text-xs text-gray-400">Loading services…</p>
+                  ) : services.length > 0 ? (
+                    <select
+                      value={selectedServiceId || ''}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === '__custom') {
+                          setSelectedServiceId('');
+                        } else {
+                          setSelectedServiceId(val);
+                          handleFormChange('service_name', '');
+                        }
+                      }}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                      <option value="">Select a service…</option>
+                      {services.map((svc) => (
+                        <option key={svc.id} value={svc.id}>
+                          {svc.name} ({svc.duration_minutes} min)
+                        </option>
+                      ))}
+                      <option value="__custom">Custom / not listed</option>
+                    </select>
+                  ) : (
+                    <p className="text-xs text-gray-500">
+                      No services yet. Type a description below or add services in
+                      Settings.
+                    </p>
+                  )}
+                </div>
+
+                <Input
+                  label="Service name / description"
+                  value={form.service_name}
+                  onChange={(e) => handleFormChange('service_name', e.target.value)}
+                  placeholder="e.g. Haircut, Consultation, Massage…"
+                />
+              </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input

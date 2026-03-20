@@ -10,6 +10,9 @@ import {
   ArrowPathIcon,
   PlusIcon,
   SparklesIcon,
+  ChartBarIcon,
+  ChartPieIcon,
+  ChevronRightIcon,
 } from '@heroicons/react/24/outline';
 import {
   BarChart,
@@ -108,9 +111,14 @@ const DashboardPage = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-500">Welcome back! Here's what's happening.</p>
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-sm">
+            <CalendarIcon className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Business Dashboard</h1>
+            <p className="text-sm text-gray-500">Welcome back! Here's what's happening.</p>
+          </div>
         </div>
         <Link
           to="/dashboard/appointments"
@@ -260,7 +268,16 @@ const DashboardPage = () => {
         {/* Monthly Trend Chart */}
         {stats?.monthly_trend?.length > 0 && (
           <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-            <h2 className="text-base font-semibold text-gray-800 mb-4">Appointments — Last 12 Months</h2>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+                  <ChartBarIcon className="h-4 w-4 text-indigo-600" />
+                </div>
+                <h2 className="text-base font-semibold text-gray-800">
+                  Appointments — Last 12 Months
+                </h2>
+              </div>
+            </div>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={stats.monthly_trend} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -276,7 +293,14 @@ const DashboardPage = () => {
         {/* Status Breakdown Pie */}
         {pieData.length > 0 && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-            <h2 className="text-base font-semibold text-gray-800 mb-4">Status Breakdown</h2>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center">
+                  <ChartPieIcon className="h-4 w-4 text-slate-600" />
+                </div>
+                <h2 className="text-base font-semibold text-gray-800">Status Breakdown</h2>
+              </div>
+            </div>
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
                 <Pie
@@ -302,12 +326,18 @@ const DashboardPage = () => {
       {/* Upcoming Appointments */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-gray-800">Upcoming Appointments</h2>
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+              <ClockIcon className="h-4 w-4 text-emerald-600" />
+            </div>
+            <h2 className="text-base font-semibold text-gray-800">Upcoming Appointments</h2>
+          </div>
           <Link
             to="/dashboard/appointments"
-            className="text-sm text-indigo-600 hover:text-indigo-700"
+            className="inline-flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700"
           >
-            View all →
+            <span>View all</span>
+            <ChevronRightIcon className="h-4 w-4" />
           </Link>
         </div>
         {upcoming.length === 0 ? (

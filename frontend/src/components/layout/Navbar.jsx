@@ -31,8 +31,6 @@ const Navbar = () => {
         { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
         { name: 'Calendar', href: '/dashboard/appointments', icon: CalendarIcon },
         { name: 'Clients', href: '/dashboard/clients', icon: UserGroupIcon },
-        { name: 'Services', href: '/dashboard/business#services', icon: WrenchIcon },
-        { name: 'My Business', href: '/dashboard/business', icon: BuildingOfficeIcon },
         { name: 'Billing & Plan', href: '/dashboard/billing', icon: CreditCardIcon },
         { name: 'Settings', href: '/dashboard/settings', icon: Cog6ToothIcon },
       ]

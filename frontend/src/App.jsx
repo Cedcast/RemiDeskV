@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast';
 
 import { AuthProvider } from './contexts/AuthContext';
-import { Layout, AdminLayout } from './components/layout';
+import { AdminLayout, OwnerLayout } from './components/layout';
 import { ProtectedRoute, AdminRoute } from './components/auth';
 
 // Pages
@@ -27,6 +27,7 @@ import {
   AdminUsersPage,
   AdminUserDetailPage,
   AdminBusinessesPage,
+  AdminBusinessDetailPage,
   AdminSubscriptionsPage,
   AdminPaymentsPage,
   AdminNotificationsPage,
@@ -53,56 +54,20 @@ function App() {
           {/* Public reschedule portal (token-based, no auth required) */}
           <Route path="/reschedule/:token" element={<ReschedulePage />} />
 
-          {/* Business owner protected routes */}
-          <Route element={<Layout />}>
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <DashboardPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard/appointments"
-              element={
-                <ProtectedRoute>
-                  <AppointmentsManagePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard/business"
-              element={
-                <ProtectedRoute>
-                  <BusinessManagePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard/clients"
-              element={
-                <ProtectedRoute>
-                  <ClientsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard/billing"
-              element={
-                <ProtectedRoute>
-                  <BillingPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard/settings"
-              element={
-                <ProtectedRoute>
-                  <SettingsPage />
-                </ProtectedRoute>
-              }
-            />
+          {/* Business owner protected routes with sidebar layout */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <OwnerLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/dashboard/appointments" element={<AppointmentsManagePage />} />
+            <Route path="/dashboard/business" element={<SettingsPage />} />
+            <Route path="/dashboard/clients" element={<ClientsPage />} />
+            <Route path="/dashboard/billing" element={<BillingPage />} />
+            <Route path="/dashboard/settings" element={<SettingsPage />} />
           </Route>
 
           {/* Superadmin protected routes */}
@@ -117,6 +82,7 @@ function App() {
             <Route path="/admin/users" element={<AdminUsersPage />} />
             <Route path="/admin/users/:id" element={<AdminUserDetailPage />} />
             <Route path="/admin/businesses" element={<AdminBusinessesPage />} />
+            <Route path="/admin/businesses/:id" element={<AdminBusinessDetailPage />} />
             <Route path="/admin/subscriptions" element={<AdminSubscriptionsPage />} />
             <Route path="/admin/payments" element={<AdminPaymentsPage />} />
             <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
