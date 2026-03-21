@@ -1,18 +1,13 @@
 @import "tailwindcss";
 
-/* Corporate Theme - Option A */
+/* Light global overrides; main styling handled by Tailwind utility classes. */
 
 body {
-    background-color: #FFFFFF;
-    color: #333333;
+    background-color: #020617;
+    color: #e5e7eb;
 }
 
 .small-text {
-    color: #FFFFFF; 
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.signup-form input[name="phone"] {
-    border: 1px solid #CCCCCC;
-    padding: 10px;
+    /* Let components control exact color; keep it simple and readable by default. */
+    font-size: 0.8rem;
 }
